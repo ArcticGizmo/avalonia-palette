@@ -63,40 +63,62 @@ Consumers add the same feed (with their own PAT) and `dotnet add package ArcticG
 
 ---
 
-## Option C — nuget.org (public)  ← chosen
+## Option C — nuget.org via Trusted Publishing  ← chosen
 
-For a package anyone can install. **Irreversible-ish**: the id is claimed by your account on first
-push and a version can only be unlisted, not deleted.
+Public, and **keyless**: instead of storing a long-lived API key, GitHub Actions mints a
+short-lived (~1 hour) key from an OIDC token at push time. There is no secret to leak or rotate.
+The ready-made workflow is at [`.github/workflows/publish.yml`](../.github/workflows/publish.yml).
 
-### One-time account setup
+**Irreversible-ish**: the id `ArcticGizmo.Avalonia.Palette` is claimed by your account on first
+publish and a version can only be unlisted, not deleted.
 
-1. Sign in at <https://www.nuget.org> with your Microsoft or GitHub account (creates the profile).
-2. Enable two-factor auth if prompted — nuget.org requires it to publish.
-3. Create an API key: **Account → API Keys → Create**.
-   - Key name: e.g. `arcticgizmo-push`.
-   - Scopes: **Push** → *Push new packages and package versions*.
-   - **Glob pattern**: `ArcticGizmo.*` — scopes the key to your prefix so a leaked key can't touch
-     anything else.
-   - Expiry: up to 365 days.
-4. You do **not** need to pre-create the package page. The first `dotnet nuget push` creates
-   `ArcticGizmo.Avalonia.Palette` and assigns ownership to your account.
-5. *(Optional)* Reserve the `ArcticGizmo.*` **ID prefix** (nuget.org → package → *Reserve ID
-   prefix*, or via support) so only you can publish ids under it. Not required to publish.
+### One-time setup
 
-### Push
+1. **Account** — sign in at <https://www.nuget.org> with your Microsoft or GitHub account, and
+   enable 2FA if prompted.
+2. **Register the trusted publishing policy** — Account → **Trusted Publishing** → new policy:
+   | Field | Value |
+   |---|---|
+   | Repository Owner | `ArcticGizmo` |
+   | Repository | `avalonia-pallete` |
+   | Workflow File | `publish.yml` *(file name only — no `.github/workflows/` path)* |
+   | Environment | *(leave empty — the workflow doesn't use one)* |
+
+   > If you don't see **Trusted Publishing**, it's still rolling out to accounts — use the
+   > API-key fallback below meanwhile.
+3. **GitHub repo secret** — add `NUGET_USER` = your nuget.org **profile name** (not your email).
+   The workflow passes it to the `NuGet/login` action.
+4. You do **not** pre-create the package page; the first successful push creates it and assigns
+   ownership to your account.
+
+> **Private-repo note:** a new policy is "pending activation" for 7 days until a first publish
+> locks it to your repo/owner IDs (prevents repo-name resurrection attacks). Public repos activate
+> immediately.
+
+### Publish
+
+```bash
+# bump <Version> in the csproj if you want, then tag and push:
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+The workflow runs the WCAG gate, packs with the tag's version, exchanges the OIDC token for a
+temporary key, and pushes the package + symbols. Watch it under the repo's **Actions** tab.
+Installable a few minutes later with `dotnet add package ArcticGizmo.Avalonia.Palette`.
+
+### API-key fallback (if Trusted Publishing isn't available to your account yet)
+
+Create an API key at **Account → API Keys** scoped to glob `ArcticGizmo.*`, then:
 
 ```bash
 dotnet pack src/Palette.Theming -c Release -o artifacts
-
 dotnet nuget push artifacts/ArcticGizmo.Avalonia.Palette.0.1.0.nupkg \
-  --source https://api.nuget.org/v3/index.json --api-key <NUGET_API_KEY>
-# symbols too (optional, enables source-linked debugging):
-dotnet nuget push artifacts/ArcticGizmo.Avalonia.Palette.0.1.0.snupkg \
   --source https://api.nuget.org/v3/index.json --api-key <NUGET_API_KEY>
 ```
 
-It appears under *Manage Packages* within a minute and is installable (after indexing, a few
-minutes) with `dotnet add package ArcticGizmo.Avalonia.Palette`.
+Sources: [Trusted Publishing on nuget.org (Microsoft Learn)](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing) ·
+[.NET Blog announcement](https://devblogs.microsoft.com/dotnet/enhanced-security-is-here-with-the-new-trust-publishing-on-nuget-org/)
 
 ---
 

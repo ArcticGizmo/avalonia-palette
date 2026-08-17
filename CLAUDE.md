@@ -12,9 +12,12 @@ dotnet run   --project src/Palette.Sample -- --verify    # headless WCAG gate (C
 dotnet pack  src/Palette.Theming -c Release -o artifacts  # build the distributable NuGet package
 ```
 
-`Palette.Theming` ships as a NuGet package (metadata in its `.csproj`; distribution options in
-`docs/publishing.md`). Bump `<Version>` per release; the token key names are the public API, so
-renaming one is a breaking change.
+`Palette.Theming` ships as the NuGet package **`ArcticGizmo.Avalonia.Palette`** (assembly/namespace
+stays `Palette.Theming`; metadata in its `.csproj`). Releases are automated: pushing a `v*` tag runs
+`.github/workflows/publish.yml`, which WCAG-gates, packs with the tag's version, and publishes to
+nuget.org via **Trusted Publishing** (OIDC — no stored API key; needs repo secret `NUGET_USER` and a
+matching nuget.org policy). Distribution options: `docs/publishing.md`. The token key names are the
+public API, so renaming one is a breaking change.
 
 .NET 10 SDK · Avalonia 12.0.5 · CommunityToolkit.Mvvm · Fluent base theme. No central package
 management (versions are pinned per-`.csproj`, matching the author's sibling apps).
