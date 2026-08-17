@@ -1,0 +1,63 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Palette.Sample.ViewModels"
+             x:Class="Palette.Sample.Views.LayoutView"
+             x:DataType="vm:LayoutViewModel">
+
+    <ScrollViewer>
+        <StackPanel Margin="28,24" Spacing="16" MaxWidth="900" HorizontalAlignment="Left">
+
+            <!-- Surface ladder -->
+            <Border Classes="panel">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Surface ladder" Classes="phead" />
+                    <TextBlock Classes="help"
+                               Text="Depth is built from three neutrals: the app surface, a raised panel, and a sunken well. Keep the steps small so the eye isn't jarred." />
+                    <Grid ColumnDefinitions="*,*,*" Height="96">
+                        <Border Grid.Column="0" Background="{DynamicResource FormBgBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                CornerRadius="8,0,0,8">
+                            <TextBlock Text="Surface" Classes="help" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Column="1" Background="{DynamicResource PanelBgBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,1">
+                            <TextBlock Text="Raised panel" Classes="help" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <Border Grid.Column="2" Background="{DynamicResource SurfaceSunkenBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                CornerRadius="0,8,8,0">
+                            <TextBlock Text="Sunken well" Classes="help" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Typography -->
+            <Border Classes="panel">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Typography scale" Classes="phead" />
+                    <TextBlock Text="Page title — 22px SemiBold" Classes="pagetitle" />
+                    <TextBlock Text="Body / field text — 13px. The quick brown fox jumps over the lazy dog." Classes="field" />
+                    <TextBlock Text="Muted help text — 12px, for secondary guidance and captions." Classes="help" />
+                    <TextBlock Text="SECTION HEADING — 11px letter-spaced" Classes="phead" />
+                    <TextBlock Text="mono — const x = 42; // Cascadia / Consolas" Classes="mono" />
+                </StackPanel>
+            </Border>
+
+            <!-- Nested card + well -->
+            <Border Classes="panel">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Card with a nested well" Classes="phead" />
+                    <TextBlock Classes="help" Text="Panels hold content; wells recess code, logs or read-only detail." />
+                    <Border Classes="well">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="~/projects/emuwren" Classes="mono" />
+                            <TextBlock Text="last built 4 minutes ago" Classes="help" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

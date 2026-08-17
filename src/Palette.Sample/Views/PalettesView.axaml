@@ -1,0 +1,86 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Palette.Sample.ViewModels"
+             x:Class="Palette.Sample.Views.PalettesView"
+             x:DataType="vm:PalettesViewModel">
+
+    <Grid ColumnDefinitions="*,360">
+
+        <!-- Gallery -->
+        <ScrollViewer Grid.Column="0">
+            <ItemsControl ItemsSource="{Binding Palettes}" Margin="24,22,12,22">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:CompileBindings="False" DataType="vm:PaletteChoiceViewModel">
+                        <Border Classes="panel" Width="248" Margin="0,0,14,14" Padding="0">
+                            <StackPanel>
+                                <!-- Swatch preview strip drawn from the palette's OWN colours -->
+                                <Border Height="72" CornerRadius="12,12,0,0" Background="{Binding SurfaceSwatch}"
+                                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+                                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="14"
+                                                VerticalAlignment="Center">
+                                        <Border Width="34" Height="34" CornerRadius="6" Background="{Binding PanelSwatch}" />
+                                        <Border Width="34" Height="34" CornerRadius="6" Background="{Binding EditorSwatch}" />
+                                        <Border Width="34" Height="34" CornerRadius="6" Background="{Binding AccentSwatch}" />
+                                        <Border Width="34" Height="34" CornerRadius="6" Background="{Binding TextSwatch}" />
+                                    </StackPanel>
+                                </Border>
+                                <StackPanel Margin="16,12,16,14" Spacing="8">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="{Binding Display}" Classes="field" FontWeight="SemiBold" />
+                                        <TextBlock Grid.Column="1" Text="{Binding WcagLabel}" FontSize="11" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource OkBrush}" VerticalAlignment="Center" />
+                                    </Grid>
+                                    <TextBlock Text="{Binding Description}" Classes="help" Height="48" />
+                                    <Button Classes="secondary" HorizontalAlignment="Stretch"
+                                            HorizontalContentAlignment="Center"
+                                            Content="Apply"
+                                            Command="{Binding $parent[UserControl].DataContext.ApplyCommand}"
+                                            CommandParameter="{Binding}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Live WCAG report for the ACTIVE palette -->
+        <Border Grid.Column="1" Background="{DynamicResource PanelBgBrush}"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1,0,0,0">
+            <DockPanel LastChildFill="True" Margin="18,20">
+                <StackPanel DockPanel.Dock="Top" Spacing="4" Margin="0,0,0,12">
+                    <TextBlock Text="LIVE WCAG REPORT" Classes="phead" />
+                    <TextBlock Text="{Binding CurrentName}" Classes="field" FontWeight="SemiBold" />
+                    <TextBlock Classes="help"
+                               Text="Contrast ratios for the active palette. Body/syntax/status/diff target AA (4.5:1); borders are non-text UI (3:1)." />
+                </StackPanel>
+
+                <ScrollViewer>
+                    <ItemsControl ItemsSource="{Binding Checks}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ContrastRowViewModel">
+                                <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,5">
+                                    <Border Grid.Column="0" Width="8" Height="8" CornerRadius="4"
+                                            VerticalAlignment="Center" Margin="0,0,10,0"
+                                            Background="{Binding StatusBrush}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Label}" FontSize="12"
+                                               Foreground="{DynamicResource FgBrush}" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="2" Text="{Binding RatioText}" Classes="mono" FontSize="11.5"
+                                               Width="56" TextAlignment="Right" VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="3" Text="{Binding LevelText}" FontSize="10.5"
+                                               Width="58" TextAlignment="Right" VerticalAlignment="Center"
+                                               Foreground="{DynamicResource MutedBrush}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+    </Grid>
+</UserControl>

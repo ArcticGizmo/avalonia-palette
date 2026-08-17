@@ -1,0 +1,58 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Palette.Sample.ViewModels"
+             x:Class="Palette.Sample.Views.OverviewView"
+             x:DataType="vm:OverviewViewModel">
+
+    <ScrollViewer>
+        <StackPanel Margin="28,24" Spacing="16" MaxWidth="860" HorizontalAlignment="Left">
+
+            <Border Classes="alert info">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Swap any palette from the top-right — everything recolours instantly."
+                               Classes="field" FontWeight="SemiBold" />
+                    <TextBlock Classes="help"
+                               Text="There is no reload and no visual-tree walk. Every brush you see is one shared instance whose colour is mutated in place, so StaticResource, DynamicResource and code-behind consumers all update together." />
+                </StackPanel>
+            </Border>
+
+            <Border Classes="panel">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="What this template is" Classes="phead" />
+                    <TextBlock Classes="help"
+                               Text="A reusable Avalonia theming library (Palette.Theming) plus this sample app. Other projects reference the library, call ThemeManager.Initialize(app, palette) once, and paint everything through ~70 semantic tokens. Twelve palettes ship built-in: six families, each with a light and a dark variant, tuned for long editing sessions." />
+                    <Border Classes="hr" Margin="0,4" />
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" >
+                        <TextBlock Grid.Row="0" Grid.Column="0" Classes="field" Text="• Layout: surfaces, cards, wells" Margin="0,3" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Classes="field" Text="• Nav: rail, rows, active state" Margin="0,3" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Classes="field" Text="• Editor: text area + full file" Margin="0,3" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Classes="field" Text="• Git diff: add / remove / hunk" Margin="0,3" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" Classes="field" Text="• Buttons: accent / neutral / danger" Margin="0,3" />
+                        <TextBlock Grid.Row="2" Grid.Column="1" Classes="field" Text="• Alerts + live WCAG report" Margin="0,3" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border Classes="panel">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Why these colours" Classes="phead" />
+                    <TextBlock Classes="help"
+                               Text="Dark schemes avoid pure black to prevent halation; light schemes avoid pure white glare. Brightness contrast is dialled down while hue contrast is kept for legibility (the Solarized principle). Every text, syntax, status and diff pairing meets WCAG AA (≥ 4.5:1) — see the Palettes &amp; WCAG page for the live report. Full sources are in docs/palette-rationale.md." />
+                </StackPanel>
+            </Border>
+
+            <Border Classes="panel">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Drop-in for existing apps" Classes="phead" />
+                    <TextBlock Classes="help"
+                               Text="The house token names (FormBgBrush, PanelBgBrush, FgBrush, AccentBrush, OkBrush, WarnBrush, DangerBrush …) are preserved as first-class keys, so apps already using them get light-mode and live-swapping for free." />
+                    <Border Classes="well">
+                        <TextBlock Classes="mono" TextWrapping="Wrap"
+                                   Text="ThemeManager.Initialize(app, PaletteCatalog.Default);&#10;// later, from anywhere:&#10;ThemeManager.Current.Apply(&quot;solarized-light&quot;);" />
+                    </Border>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

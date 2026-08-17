@@ -1,0 +1,92 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Palette.Sample.ViewModels"
+             x:Class="Palette.Sample.Views.ControlsView"
+             x:DataType="vm:ControlsViewModel">
+
+    <ScrollViewer>
+        <StackPanel Margin="28,24" Spacing="16" MaxWidth="900" HorizontalAlignment="Left">
+
+            <!-- Buttons -->
+            <Border Classes="panel">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Buttons" Classes="phead" />
+                    <WrapPanel Orientation="Horizontal">
+                        <Button Classes="primary" Content="Primary action" Margin="0,0,10,10" />
+                        <Button Classes="secondary" Content="Secondary" Margin="0,0,10,10" />
+                        <Button Classes="danger" Content="Delete" Margin="0,0,10,10" />
+                        <Button Classes="link" Content="A link button" Margin="0,0,10,10" VerticalAlignment="Center" />
+                        <Button Classes="primary" Content="Disabled" IsEnabled="False" Margin="0,0,10,10" />
+                    </WrapPanel>
+                    <TextBlock Classes="help"
+                               Text="Primary fills with the accent and uses the on-accent text colour (contrast-checked). Neutral and danger read against panels." />
+                </StackPanel>
+            </Border>
+
+            <!-- Inputs -->
+            <Border Classes="panel">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Inputs" Classes="phead" />
+                    <TextBox PlaceholderText="A themed text box…" Width="300" HorizontalAlignment="Left" />
+                    <StackPanel Orientation="Horizontal" Spacing="16">
+                        <CheckBox Content="Enable telemetry" />
+                        <ToggleSwitch OnContent="On" OffContent="Off" />
+                        <ComboBox SelectedIndex="0" Width="160">
+                            <ComboBoxItem>Option one</ComboBoxItem>
+                            <ComboBoxItem>Option two</ComboBoxItem>
+                        </ComboBox>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Status text -->
+            <Border Classes="panel">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Status text" Classes="phead" />
+                    <TextBlock Classes="status ok" Text="✓ Build succeeded" />
+                    <TextBlock Classes="status warn" Text="⚠ 3 warnings" />
+                    <TextBlock Classes="status err" Text="✗ 1 test failed" />
+                    <TextBlock Classes="status info" Text="ℹ Reconnecting…" />
+                </StackPanel>
+            </Border>
+
+            <!-- Alerts -->
+            <Border Classes="panel">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Alert banners" Classes="phead" />
+                    <Border Classes="alert info">
+                        <TextBlock Classes="field" Text="A new version is available. Restart to update." />
+                    </Border>
+                    <Border Classes="alert ok">
+                        <TextBlock Classes="field" Text="All changes saved and pushed." />
+                    </Border>
+                    <Border Classes="alert warn">
+                        <TextBlock Classes="field" Text="Working directory has uncommitted changes." />
+                    </Border>
+                    <Border Classes="alert err">
+                        <TextBlock Classes="field" Text="Failed to connect to the emulator. Check the daemon." />
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <!-- Badges -->
+            <Border Classes="panel">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Badges" Classes="phead" />
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Border Classes="badge">
+                            <TextBlock Text="12 open" FontSize="11" Foreground="{DynamicResource AccentBrush}" />
+                        </Border>
+                        <Border Classes="badge" Background="{DynamicResource SuccessBgBrush}">
+                            <TextBlock Text="passing" FontSize="11" Foreground="{DynamicResource OkBrush}" />
+                        </Border>
+                        <Border Classes="badge" Background="{DynamicResource WarningBgBrush}">
+                            <TextBlock Text="DEV" FontSize="11" Foreground="{DynamicResource DevBrush}" FontWeight="SemiBold" />
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
