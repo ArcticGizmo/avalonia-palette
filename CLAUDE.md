@@ -40,13 +40,18 @@ palette swap, **mutates each brush's `.Color` in place**. That in-place mutation
 | Token contract (~70 keys, incl. house aliases) | `src/Palette.Theming/ThemeTokens.cs` |
 | A palette's seed roles + derivation | `src/Palette.Theming/PaletteDefinition.cs` |
 | The 18 built-in palettes (9 families × L/D) | `src/Palette.Theming/PaletteCatalog.cs` |
-| Live swap engine | `src/Palette.Theming/ThemeManager.cs` |
+| Built-ins + custom palettes (runtime set) | `src/Palette.Theming/PaletteRegistry.cs` |
+| Palette ↔ JSON | `src/Palette.Theming/PaletteCodec.cs` |
+| Persist user palettes | `src/Palette.Theming/CustomPaletteStore.cs` |
+| Live swap engine (+ CVD filter, OS-follow) | `src/Palette.Theming/ThemeManager.cs` |
 | Per-user persistence (optional) | `src/Palette.Theming/ThemePreferences.cs` |
-| WCAG maths (Avalonia-free) | `src/Palette.Theming/Color/Contrast.cs` |
+| WCAG maths + AdjustToMeet (Avalonia-free) | `src/Palette.Theming/Color/Contrast.cs` |
+| Colour-blindness simulation | `src/Palette.Theming/Color/CvdSim.cs` |
 | WCAG report model | `src/Palette.Theming/ContrastReport.cs` |
 | Shared control styles | `src/Palette.Sample/Styles/Controls.axaml` |
 | Editor / diff surfaces (code-built) | `src/Palette.Sample/Controls/CodeRenderer.cs` |
 | AvaloniaEdit syntax colouriser | `src/Palette.Sample/Controls/TokenColorizer.cs` |
+| Theme designer page | `src/Palette.Sample/ViewModels/DesignerViewModel.cs` |
 
 ## Rules when changing palettes
 

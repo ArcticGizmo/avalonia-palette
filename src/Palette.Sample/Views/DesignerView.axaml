@@ -1,0 +1,115 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Palette.Sample.ViewModels"
+             x:Class="Palette.Sample.Views.DesignerView"
+             x:DataType="vm:DesignerViewModel">
+
+    <Grid ColumnDefinitions="*,340">
+
+        <ScrollViewer Grid.Column="0">
+            <StackPanel Margin="24,22,14,22" Spacing="16">
+
+                <!-- Controls -->
+                <Border Classes="panel">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="DESIGN A PALETTE" Classes="phead" />
+                        <TextBlock Classes="help"
+                                   Text="Pick a base, tweak the roles below, and the whole app previews live. Roles not shown here inherit from the base. Save to add it to the switcher." />
+
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="8">
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Base" Classes="field" VerticalAlignment="Center" />
+                            <ComboBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch"
+                                      ItemsSource="{Binding Bases}" SelectedItem="{Binding SelectedBase}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:PaletteChoiceViewModel">
+                                        <TextBlock Text="{Binding Display}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Name" Classes="field" VerticalAlignment="Center" />
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" />
+                        </Grid>
+
+                        <StackPanel Orientation="Horizontal" Spacing="16">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <TextBlock Text="Dark variant" Classes="field" VerticalAlignment="Center" />
+                                <ToggleSwitch IsChecked="{Binding IsDarkVariant}" OnContent="Dark" OffContent="Light" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <TextBlock Text="Colour-blind preview" Classes="field" VerticalAlignment="Center" />
+                                <ComboBox ItemsSource="{Binding CvdOptions}" SelectedItem="{Binding SelectedCvd}" Width="150" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Button Classes="primary" Content="Save palette" Command="{Binding SaveCommand}" />
+                            <Button Classes="secondary" Content="Export JSON" x:Name="ExportButton" />
+                            <Button Classes="secondary" Content="Import JSON" x:Name="ImportButton" />
+                        </StackPanel>
+
+                        <TextBlock Text="{Binding Status}" Classes="help" IsVisible="{Binding Status, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Role pickers -->
+                <Border Classes="panel">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="ROLES" Classes="phead" />
+                        <ItemsControl ItemsSource="{Binding Roles}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:ColorRoleViewModel">
+                                    <StackPanel Width="150" Margin="0,0,12,12" Spacing="4">
+                                        <TextBlock Text="{Binding Label}" Classes="help" />
+                                        <ColorPicker Color="{Binding Color, Mode=TwoWay}"
+                                                     HorizontalAlignment="Left" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Live WCAG -->
+        <Border Grid.Column="1" Background="{DynamicResource PanelBgBrush}"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1,0,0,0">
+            <DockPanel LastChildFill="True" Margin="18,20">
+                <StackPanel DockPanel.Dock="Top" Spacing="8" Margin="0,0,0,12">
+                    <TextBlock Text="LIVE WCAG" Classes="phead" />
+                    <TextBlock Classes="help" Text="Ratios update as you edit. Fix nudges the foreground colour to reach AA (4.5:1)." />
+                    <Button Classes="secondary" HorizontalAlignment="Left"
+                            Content="Fix all to AA" Command="{Binding FixAllCommand}" />
+                </StackPanel>
+
+                <ScrollViewer>
+                    <ItemsControl ItemsSource="{Binding WcagRows}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:DesignerWcagRow">
+                                <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,5">
+                                    <Border Grid.Column="0" Width="8" Height="8" CornerRadius="4"
+                                            VerticalAlignment="Center" Margin="0,0,10,0"
+                                            Background="{Binding StatusBrush}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Label}" FontSize="12"
+                                               VerticalAlignment="Center" Foreground="{DynamicResource FgBrush}" />
+                                    <TextBlock Grid.Column="2" Text="{Binding RatioText}" Classes="mono" FontSize="11.5"
+                                               Width="52" TextAlignment="Right" VerticalAlignment="Center" />
+                                    <Button Grid.Column="3" Classes="link" Content="Fix" Margin="10,0,0,0"
+                                            IsVisible="{Binding !Pass}"
+                                            Command="{Binding FixCommand}" CommandParameter="{Binding}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+    </Grid>
+</UserControl>

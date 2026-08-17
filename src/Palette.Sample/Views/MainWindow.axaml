@@ -140,6 +140,9 @@
                         </ComboBox>
                         <Button Classes="secondary" Command="{Binding ToggleVariantCommand}"
                                 Content="Light / Dark" ToolTip.Tip="Jump to the light or dark sibling of this palette" />
+                        <CheckBox IsChecked="{Binding FollowOs}" Content="Follow OS"
+                                  VerticalAlignment="Center"
+                                  ToolTip.Tip="Track the system light/dark setting for this palette family" />
                     </StackPanel>
                 </Grid>
             </Border>

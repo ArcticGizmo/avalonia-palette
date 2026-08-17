@@ -45,13 +45,16 @@ public sealed class ThemePreferences
         }
     }
 
-    /// <summary>The saved palette, or <see cref="PaletteCatalog.Default"/> if none is saved/known.</summary>
+    /// <summary>
+    /// The saved palette, or <see cref="PaletteCatalog.Default"/> if none is saved/known.
+    /// Resolves against <see cref="PaletteRegistry"/>, so a saved <em>custom</em> palette is
+    /// restored too — load custom palettes (e.g. via <see cref="CustomPaletteStore"/>) first.
+    /// </summary>
     public PaletteDefinition LoadOrDefault()
     {
         var id = LoadPaletteId();
         if (id is null) return PaletteCatalog.Default;
-        try { return PaletteCatalog.ById(id); }
-        catch { return PaletteCatalog.Default; }
+        return PaletteRegistry.Instance.Find(id) ?? PaletteCatalog.Default;
     }
 
     /// <summary>Persist the chosen palette id. Best-effort; failures are swallowed.</summary>

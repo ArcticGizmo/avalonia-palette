@@ -133,6 +133,43 @@ map the tokens onto its properties:
 Fetch each with `ThemeManager.Current.Brush(...)` and refresh on `PaletteChanged` (AvaloniaEdit's
 `HighlightingColor` values are copied, not observed, so re-apply them in the handler).
 
+## 8. Runtime custom palettes, OS-follow, colour-blind preview
+
+**User-defined palettes.** Any `PaletteDefinition` can be applied — built-in or not — so a custom
+theme is first-class. `PaletteRegistry.Instance` is the runtime set (built-ins + custom) that
+pickers and `ThemeManager` resolve ids against; `CustomPaletteStore` persists user palettes as
+JSON and loads them back:
+
+```csharp
+// startup: load saved custom palettes BEFORE restoring the preference
+new CustomPaletteStore("MyApp").Load();
+ThemeManager.Initialize(this, new ThemePreferences("MyApp").LoadOrDefault());
+
+// build one from a base and save it (adds to the registry → appears in your picker)
+var mine = PaletteCatalog.NordDark with { Id = "custom-mine", Name = "Mine", Family = "Mine",
+                                          Accent = Rgb.FromHex("#FF7A00") };
+new CustomPaletteStore("MyApp").SavePalette(mine);
+
+// serialise for export / import
+string json = PaletteCodec.ToJson(mine);
+PaletteDefinition back = PaletteCodec.FromJson(json);
+```
+
+Bind your picker to `PaletteRegistry.Instance.All` and subscribe to `PaletteRegistry.Instance.Changed`
+so custom palettes show up as they're added. (The sample's `DesignerViewModel` is a full worked
+example — pickers, live preview, WCAG fixes, export/import.)
+
+**Follow the OS.** `ThemeManager.Current.FollowOsTheme(true)` tracks the system light/dark setting
+and switches to the matching variant of the current family, reacting to the user changing it.
+
+**Contrast auto-fix.** `Contrast.AdjustToMeet(fg, bg, Contrast.AaText)` returns the nearest colour
+to `fg` (blended toward black/white) that reaches the target ratio — the engine behind the
+designer's *Fix* buttons; also handy to harden a palette programmatically.
+
+**Colour-blindness preview.** `ThemeManager.Current.SetCvd(Cvd.Deuteranopia)` re-applies the
+current palette through a simulation filter so you can see the whole app as a colour-blind user
+would; `CvdSim.Simulate(rgb, type)` transforms a single colour.
+
 ## Notes
 
 - **Do not** replace the brush *instances* in `Application.Resources`; let `ThemeManager` mutate

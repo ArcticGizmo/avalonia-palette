@@ -13,12 +13,19 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        // Restore the user's last palette (or the default), register the themed brush set, and
-        // persist any future swap. Doing this before any view is built means
-        // {StaticResource}/{DynamicResource} lookups resolve on first paint.
+        // Load any user-defined palettes into the registry BEFORE restoring the preference, so a
+        // saved custom palette resolves. Then register the brush set, restore the last palette,
+        // and persist future swaps.
+        new CustomPaletteStore("AvaloniaPalette.Sample").Load();
         var prefs = new ThemePreferences("AvaloniaPalette.Sample");
         ThemeManager.Initialize(this, prefs.LoadOrDefault());
-        ThemeManager.Current.PaletteChanged += (_, p) => prefs.Save(p.Id);
+
+        // Persist only palettes that exist in the registry (built-ins + saved customs). This
+        // stops the designer's transient live previews from clobbering the remembered choice.
+        ThemeManager.Current.PaletteChanged += (_, p) =>
+        {
+            if (PaletteRegistry.Instance.Find(p.Id) is not null) prefs.Save(p.Id);
+        };
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

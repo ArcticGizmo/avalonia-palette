@@ -56,4 +56,15 @@ first-class keys, so existing views keep working and gain light mode + live swap
 Full docs, the token reference, the palette rationale (with WCAG sources) and a sample app live in
 the [project repository](https://github.com/ArcticGizmo/avalonia-pallete).
 
+## For AI agents
+
+Imperative usage rules for coding agents are in
+[`AGENTS.md`](https://github.com/ArcticGizmo/avalonia-pallete/blob/main/AGENTS.md)
+(raw: `https://raw.githubusercontent.com/ArcticGizmo/avalonia-pallete/main/AGENTS.md`). It's also
+bundled in this package under `docs/AGENTS.md`. The one rule that matters most: **paint with the
+token brushes and call `ThemeManager.Current.Apply(...)` to swap — never replace the brush
+instances in `Application.Resources`** (the engine mutates their colour in place so everything
+recolours live). Every public type carries XML doc comments, so IntelliSense-driven agents get the
+API surface for free.
+
 MIT licensed.

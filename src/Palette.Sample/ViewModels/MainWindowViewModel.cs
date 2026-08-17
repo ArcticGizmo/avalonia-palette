@@ -10,8 +10,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase
     private bool _suppressApply;
 
     public ObservableCollection<object> NavItems { get; } = new();
-    public ObservableCollection<PaletteChoiceViewModel> Palettes { get; } =
-        new(PaletteCatalog.All.Select(p => new PaletteChoiceViewModel(p)));
+    public ObservableCollection<PaletteChoiceViewModel> Palettes { get; } = new();
 
     private readonly List<PageViewModel> _pages;
 
@@ -19,6 +18,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private PaletteChoiceViewModel? _selectedPalette;
     [ObservableProperty] private string _currentPaletteName = "";
     [ObservableProperty] private bool _currentPassesAa;
+    [ObservableProperty] private bool _followOs;
 
     public MainWindowViewModel()
     {
@@ -31,6 +31,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase
             new DiffViewModel(),
             new ControlsViewModel(),
             new PalettesViewModel(),
+            new DesignerViewModel(),
         ];
 
         NavItems.Add(new NavHeaderViewModel("Explore"));
@@ -38,11 +39,15 @@ public sealed partial class MainWindowViewModel : ViewModelBase
         NavItems.Add(new NavHeaderViewModel("Editing surfaces"));
         foreach (var p in _pages.Skip(2).Take(3)) NavItems.Add(p);
         NavItems.Add(new NavHeaderViewModel("Components"));
-        foreach (var p in _pages.Skip(5)) NavItems.Add(p);
+        foreach (var p in _pages.Skip(5).Take(1)) NavItems.Add(p);
+        NavItems.Add(new NavHeaderViewModel("Customize"));
+        foreach (var p in _pages.Skip(6)) NavItems.Add(p);
 
         _currentPage = _pages[0];
         _currentPage.IsActive = true;
 
+        RebuildPalettes();
+        PaletteRegistry.Instance.Changed += (_, _) => RebuildPalettes();
         ThemeManager.Current.PaletteChanged += (_, p) => OnPaletteChanged(p);
         OnPaletteChanged(ThemeManager.Current.CurrentPalette);
     }
@@ -61,15 +66,30 @@ public sealed partial class MainWindowViewModel : ViewModelBase
     private void ToggleVariant()
     {
         var current = ThemeManager.Current.CurrentPalette;
-        var sibling = PaletteCatalog.Family(current.Family)
-            .FirstOrDefault(p => p.IsDark != current.IsDark);
+        var sibling = PaletteRegistry.Instance.All
+            .FirstOrDefault(p => string.Equals(p.Family, current.Family, StringComparison.OrdinalIgnoreCase)
+                                 && p.IsDark != current.IsDark);
         if (sibling is not null) ThemeManager.Current.Apply(sibling);
     }
+
+    partial void OnFollowOsChanged(bool value) => ThemeManager.Current.FollowOsTheme(value);
 
     partial void OnSelectedPaletteChanged(PaletteChoiceViewModel? value)
     {
         if (_suppressApply || value is null) return;
         ThemeManager.Current.Apply(value.Palette);
+    }
+
+    private void RebuildPalettes()
+    {
+        _suppressApply = true;
+        Palettes.Clear();
+        foreach (var p in PaletteRegistry.Instance.All)
+            Palettes.Add(new PaletteChoiceViewModel(p));
+
+        var currentId = ThemeManager.Current.CurrentPalette?.Id;
+        SelectedPalette = Palettes.FirstOrDefault(x => x.Id == currentId);
+        _suppressApply = false;
     }
 
     private void OnPaletteChanged(PaletteDefinition p)

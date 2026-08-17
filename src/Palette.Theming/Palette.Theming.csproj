@@ -39,6 +39,9 @@
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\" />
+    <!-- Ship the agent guide inside the package so it lands on disk with the restored package
+         (some AI agent setups index that), in addition to being hosted in the repo. -->
+    <None Include="..\..\AGENTS.md" Pack="true" PackagePath="docs\" />
   </ItemGroup>
 
   <ItemGroup>

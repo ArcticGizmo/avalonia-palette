@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Palette.Theming.Color;
 
 namespace Palette.Theming;
@@ -27,6 +28,8 @@ public sealed record PaletteDefinition
     public required string Family { get; init; }       // groups a light+dark pair, e.g. "Nord"
     public required PaletteVariant Variant { get; init; }
     public string Description { get; init; } = "";
+
+    [JsonIgnore]
     public bool IsDark => Variant == PaletteVariant.Dark;
 
     // ── Surfaces ─────────────────────────────────────────────────────────

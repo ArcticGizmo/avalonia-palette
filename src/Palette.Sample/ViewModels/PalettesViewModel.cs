@@ -13,8 +13,7 @@ public sealed partial class PalettesViewModel : PageViewModel
     public override string Glyph => "◑";
     public override string Blurb => "Every built-in palette, with a live contrast report against the current one.";
 
-    public ObservableCollection<PaletteChoiceViewModel> Palettes { get; } =
-        new(PaletteCatalog.All.Select(p => new PaletteChoiceViewModel(p)));
+    public ObservableCollection<PaletteChoiceViewModel> Palettes { get; } = new();
 
     public ObservableCollection<ContrastRowViewModel> Checks { get; } = new();
 
@@ -23,8 +22,17 @@ public sealed partial class PalettesViewModel : PageViewModel
 
     public PalettesViewModel()
     {
+        RebuildPalettes();
+        PaletteRegistry.Instance.Changed += (_, _) => RebuildPalettes();
         ThemeManager.Current.PaletteChanged += (_, p) => Refresh(p);
         Refresh(ThemeManager.Current.CurrentPalette);
+    }
+
+    private void RebuildPalettes()
+    {
+        Palettes.Clear();
+        foreach (var p in PaletteRegistry.Instance.All)
+            Palettes.Add(new PaletteChoiceViewModel(p));
     }
 
     [RelayCommand]

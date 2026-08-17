@@ -73,6 +73,33 @@ public static class Contrast
     /// </summary>
     public static Rgb BestForeground(Rgb background, Rgb dark, Rgb light) =>
         Ratio(dark, background) >= Ratio(light, background) ? dark : light;
+
+    /// <summary>
+    /// Nudge <paramref name="fg"/> toward black or white (whichever direction increases contrast
+    /// against <paramref name="bg"/>) by the smallest amount that reaches <paramref name="target"/>.
+    /// Hue is broadly preserved because the adjustment is a straight blend toward the achromatic
+    /// extreme. Returns the input unchanged if it already meets the target, or the best achievable
+    /// colour if the target is unreachable against this background.
+    /// </summary>
+    public static Rgb AdjustToMeet(Rgb fg, Rgb bg, double target = AaText)
+    {
+        if (Ratio(fg, bg) >= target) return fg;
+
+        // Lighten on a dark background, darken on a light one.
+        var toward = RelativeLuminance(bg) < 0.5 ? new Rgb(255, 255, 255) : new Rgb(0, 0, 0);
+
+        double lo = 0, hi = 1;
+        var best = toward; // full blend = maximum achievable contrast
+        for (var i = 0; i < 24; i++)
+        {
+            var mid = (lo + hi) / 2;
+            var candidate = fg.MixWith(toward, mid);
+            if (Ratio(candidate, bg) >= target) { best = candidate; hi = mid; }
+            else lo = mid;
+        }
+
+        return best;
+    }
 }
 
 /// <summary>WCAG compliance level achieved by a colour pair for normal text.</summary>

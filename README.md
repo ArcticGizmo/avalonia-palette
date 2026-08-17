@@ -6,11 +6,12 @@ colour palettes that are **kind to the eyes over a full working day** and hold t
 It ships:
 
 - **`Palette.Theming`** — a small, reusable theming library: ~70 semantic colour tokens, a live
-  `ThemeManager` that swaps palettes at runtime, WCAG contrast utilities, optional per-user
-  persistence, and **18 built-in palettes** (nine families × light + dark).
-- **`Palette.Sample`** — a runnable demo app you can navigate and use to swap every palette in
-  real time, with a live WCAG contrast report, a syntax-highlighted file view, a git diff, and a
-  genuinely editable **AvaloniaEdit** surface — all driven by the same tokens.
+  `ThemeManager` that swaps palettes at runtime, WCAG contrast utilities (incl. an auto-fix),
+  colour-blindness simulation, follow-the-OS light/dark, optional per-user persistence,
+  user-defined **custom palettes** (JSON), and **18 built-in palettes** (nine families × light + dark).
+- **`Palette.Sample`** — a runnable demo app: swap every palette in real time, a live WCAG report,
+  a syntax-highlighted file view, a git diff, a genuinely editable **AvaloniaEdit** surface, and a
+  **theme designer** to build & save your own palette — all driven by the same tokens.
 
 Other projects reference `Palette.Theming`, call one line at startup, and paint everything through
 the tokens. Existing apps that already use the house token names (`FormBgBrush`, `AccentBrush`,
@@ -104,6 +105,15 @@ panel / editor styles, or cherry-pick from it. Full integration notes:
 
 ---
 
+## For AI agents
+
+Working in a repo that uses this package? Point your agent at
+[`AGENTS.md`](AGENTS.md) — imperative usage rules in the cross-tool
+[agents.md](https://agents.md) convention. It's also bundled in the NuGet package under
+`docs/AGENTS.md`, and every public type carries XML doc comments (so IntelliSense-driven agents get
+the API surface without any extra setup). The load-bearing rule: **swap via
+`ThemeManager.Current.Apply(...)`; never replace the brush instances in `Application.Resources`.**
+
 ## The palettes
 
 Each family has a **Light** and a **Dark** variant. All pass WCAG AA on text/syntax/status/diff.
@@ -124,6 +134,27 @@ Colour theory and per-family sources: [`docs/palette-rationale.md`](docs/palette
 The complete token list: [`docs/token-reference.md`](docs/token-reference.md).
 
 ---
+
+## Design your own
+
+The **Theme designer** page builds a custom palette from any base: tweak the key colour roles with
+pickers and the whole app previews live, check contrast as you go (with one-click **Fix** to reach
+AA), preview it under colour-blindness, then **Save** — it joins the switcher and persists. Export
+/ import is plain JSON.
+
+![theme designer](docs/images/theme-designer.png)
+
+Because the engine applies *any* `PaletteDefinition`, custom themes are first-class. From code:
+
+```csharp
+var mine = PaletteCatalog.AuroraDark with { Accent = Rgb.FromHex("#FF7A00") };
+ThemeManager.Current.Apply(mine);                       // recolours live
+new CustomPaletteStore("MyApp").SavePalette(mine);      // persist + add to the switcher
+```
+
+Other extras: `ThemeManager.Current.FollowOsTheme(true)` tracks the system light/dark setting;
+`ThemeManager.Current.SetCvd(Cvd.Deuteranopia)` previews the whole app under colour-vision
+deficiency; `Contrast.AdjustToMeet(fg, bg)` nudges a colour until it passes AA.
 
 ## How it works (the one clever bit)
 
@@ -146,7 +177,10 @@ src/
     ThemeTokens.cs         #   the ~70-key token contract
     PaletteDefinition.cs   #   a palette's seed roles + derivation
     PaletteCatalog.cs      #   the 18 built-in palettes
-    ThemeManager.cs        #   live swap engine
+    PaletteRegistry.cs     #   built-ins + custom palettes (runtime set)
+    PaletteCodec.cs        #   palette <-> JSON
+    CustomPaletteStore.cs  #   persist user palettes
+    ThemeManager.cs        #   live swap engine (+ CVD filter, OS-follow)
     ContrastReport.cs      #   WCAG report model
     ThemePreferences.cs    #   optional per-user persistence
   Palette.Sample/          # the demo app
