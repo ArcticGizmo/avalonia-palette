@@ -7,9 +7,14 @@ Two projects: **`Palette.Theming`** (the reusable library) and **`Palette.Sample
 
 ```bash
 dotnet build Palette.slnx
-dotnet run   --project src/Palette.Sample                # launch the demo GUI
+dotnet run   --project src/Palette.Sample                # launch the demo GUI (or run.bat)
 dotnet run   --project src/Palette.Sample -- --verify    # headless WCAG gate (CI-friendly)
+dotnet pack  src/Palette.Theming -c Release -o artifacts  # build the distributable NuGet package
 ```
+
+`Palette.Theming` ships as a NuGet package (metadata in its `.csproj`; distribution options in
+`docs/publishing.md`). Bump `<Version>` per release; the token key names are the public API, so
+renaming one is a breaking change.
 
 .NET 10 SDK · Avalonia 12.0.5 · CommunityToolkit.Mvvm · Fluent base theme. No central package
 management (versions are pinned per-`.csproj`, matching the author's sibling apps).
@@ -31,12 +36,14 @@ palette swap, **mutates each brush's `.Color` in place**. That in-place mutation
 |---|---|
 | Token contract (~70 keys, incl. house aliases) | `src/Palette.Theming/ThemeTokens.cs` |
 | A palette's seed roles + derivation | `src/Palette.Theming/PaletteDefinition.cs` |
-| The 12 built-in palettes | `src/Palette.Theming/PaletteCatalog.cs` |
+| The 18 built-in palettes (9 families × L/D) | `src/Palette.Theming/PaletteCatalog.cs` |
 | Live swap engine | `src/Palette.Theming/ThemeManager.cs` |
+| Per-user persistence (optional) | `src/Palette.Theming/ThemePreferences.cs` |
 | WCAG maths (Avalonia-free) | `src/Palette.Theming/Color/Contrast.cs` |
 | WCAG report model | `src/Palette.Theming/ContrastReport.cs` |
 | Shared control styles | `src/Palette.Sample/Styles/Controls.axaml` |
 | Editor / diff surfaces (code-built) | `src/Palette.Sample/Controls/CodeRenderer.cs` |
+| AvaloniaEdit syntax colouriser | `src/Palette.Sample/Controls/TokenColorizer.cs` |
 
 ## Rules when changing palettes
 

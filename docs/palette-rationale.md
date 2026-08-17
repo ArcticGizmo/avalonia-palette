@@ -72,8 +72,15 @@ and avoids harsh blues, which many people find calmer late in the day. It is int
 | **Solarized** | Ethan Schoonover — <https://ethanschoonover.com/solarized/> | Low brightness-contrast; comment/body values raised to AA. |
 | **Nord** | Arctic Ice Studio — <https://www.nordtheme.com/> | Desaturated "Polar Night" / "Snow Storm". Muted status hues darkened/lightened to reach AA. |
 | **Gruvbox** | morhetz — <https://github.com/morhetz/gruvbox> | Warm, retro, reduced blue light; light variant hues deepened for AA on cream. |
+| **One** | Atom / GitHub's Atom One — <https://github.com/atom/one-dark-syntax> | Balanced neutral slate with a wide syntax hue spread; light variant deepened for AA on white. |
+| **Tokyo Night** | enkia — <https://github.com/enkia/tokyo-night-vscode-theme> | Deep indigo "Night" + a muted "Day" companion; a few Day hues deepened for AA. |
+| **Rosé Pine** | Rosé Pine — <https://rosepinetheme.com/> | Soft "main" dark + "Dawn" light; deliberately low-contrast (still AA), pine/rose/iris. |
 | **Sepia** | Original to this template | Warm low-blue "reading" pair; rationale above. |
 | **High Contrast** | Original to this template | Targets WCAG AAA (7:1); dark avoids pure black to limit halation. |
+
+All nine families ship a light and a dark variant (18 palettes). Where a source scheme runs a
+pairing below AA, this template nudges that value toward AA while keeping the hue; the exact seed
+is overridable in `PaletteCatalog.cs`.
 
 ## Verifying
 

@@ -13,9 +13,12 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        // Register the themed brush set and apply the starting palette before any view is
-        // built, so {StaticResource}/{DynamicResource} lookups resolve on first paint.
-        ThemeManager.Initialize(this, PaletteCatalog.Default);
+        // Restore the user's last palette (or the default), register the themed brush set, and
+        // persist any future swap. Doing this before any view is built means
+        // {StaticResource}/{DynamicResource} lookups resolve on first paint.
+        var prefs = new ThemePreferences("AvaloniaPalette.Sample");
+        ThemeManager.Initialize(this, prefs.LoadOrDefault());
+        ThemeManager.Current.PaletteChanged += (_, p) => prefs.Save(p.Id);
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {

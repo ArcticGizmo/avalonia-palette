@@ -12,6 +12,35 @@
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
+  <!-- ── NuGet package metadata ──────────────────────────────────────────
+       Produce with:  dotnet pack src/Palette.Theming -c Release
+       Consumers then:  dotnet add package Palette.Theming
+       Update PackageId / RepositoryUrl / license before publishing publicly. -->
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>ArcticGizmo.Avalonia.Palette</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>ArcticGizmo</Authors>
+    <Company>ArcticGizmo</Company>
+    <Title>Avalonia Palette — eye-strain-friendly theming</Title>
+    <Description>Runtime-swappable, WCAG-AA colour palettes for Avalonia apps: ~70 semantic tokens, a live ThemeManager that recolours in place, WCAG contrast utilities, optional per-user persistence, and 18 built-in palettes (9 families x light/dark) tuned for long editing sessions.</Description>
+    <PackageTags>avalonia;theme;theming;palette;colors;wcag;accessibility;dark-mode;light-mode;syntax</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/ArcticGizmo/avalonia-pallete</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ArcticGizmo/avalonia-pallete</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>0.1.0 — initial release: token contract, ThemeManager live swap, 18 palettes, WCAG report + verify gate, optional ThemePreferences persistence.</PackageReleaseNotes>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
   <ItemGroup>
     <!-- Base Avalonia only; consumers bring Desktop/Browser/etc. heads themselves. -->
     <PackageReference Include="Avalonia" Version="12.0.5" />

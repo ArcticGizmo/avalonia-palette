@@ -20,7 +20,7 @@
                 <StackPanel Spacing="10">
                     <TextBlock Text="What this template is" Classes="phead" />
                     <TextBlock Classes="help"
-                               Text="A reusable Avalonia theming library (Palette.Theming) plus this sample app. Other projects reference the library, call ThemeManager.Initialize(app, palette) once, and paint everything through ~70 semantic tokens. Twelve palettes ship built-in: six families, each with a light and a dark variant, tuned for long editing sessions." />
+                               Text="A reusable Avalonia theming library (Palette.Theming) plus this sample app. Other projects reference the library, call ThemeManager.Initialize(app, palette) once, and paint everything through ~70 semantic tokens. Eighteen palettes ship built-in: nine families, each with a light and a dark variant, tuned for long editing sessions. Your choice is remembered between runs." />
                     <Border Classes="hr" Margin="0,4" />
                     <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" >
                         <TextBlock Grid.Row="0" Grid.Column="0" Classes="field" Text="• Layout: surfaces, cards, wells" Margin="0,3" />

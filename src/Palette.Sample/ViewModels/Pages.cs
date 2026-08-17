@@ -21,6 +21,13 @@ public sealed class EditorViewModel : PageViewModel
     public override string Blurb => "The view you look at 90% of the day: text area, syntax-highlighted file, gutter.";
 }
 
+public sealed class EditorLiveViewModel : PageViewModel
+{
+    public override string Title => "Live editor";
+    public override string Glyph => "✎";
+    public override string Blurb => "A real editable AvaloniaEdit surface driven by the palette tokens.";
+}
+
 public sealed class DiffViewModel : PageViewModel
 {
     public override string Title => "Git diff";

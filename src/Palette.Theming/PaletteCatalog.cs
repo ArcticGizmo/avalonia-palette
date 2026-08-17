@@ -230,6 +230,111 @@ public static class PaletteCatalog
         DiffAddedText = H("#0A5A2E"), DiffRemovedText = H("#A21133"),
     };
 
+    // ═══════════════════════════════════════════════════════════════════════
+    //  One — Atom's balanced classic. Neutral surfaces, wide syntax hue spread.
+    // ═══════════════════════════════════════════════════════════════════════
+    public static readonly PaletteDefinition OneDark = new()
+    {
+        Id = "one-dark", Name = "One", Family = "One", Variant = PaletteVariant.Dark,
+        Description = "Atom's One Dark — balanced slate with a broad syntax palette.",
+        Surface = H("#282C34"), SurfaceSunken = H("#21252B"), SurfaceRaised = H("#2C313A"),
+        Overlay = H("#21252B"), Border = H("#3E4451"), Separator = H("#333842"), ButtonBg = H("#3E4451"),
+        TextPrimary = H("#ABB2BF"), TextTitle = H("#D7DAE0"), TextMuted = H("#949BA8"), TextFaint = H("#5C6370"),
+        Accent = H("#61AFEF"), AccentHover = H("#82C0F5"), OnAccent = H("#21252B"), Link = H("#61AFEF"),
+        Success = H("#98C379"), Warning = H("#E5C07B"), Danger = H("#E97F87"), Info = H("#61AFEF"), Dev = H("#C678DD"),
+        EditorBg = H("#282C34"), EditorFg = H("#ABB2BF"), EditorGutterFg = H("#5C6370"),
+        Keyword = H("#C678DD"), Str = H("#98C379"), Number = H("#D19A66"), Comment = H("#8A93A2"),
+        Function = H("#61AFEF"), Type = H("#E5C07B"), Variable = H("#E97F87"), Operator = H("#56B6C2"),
+        Constant = H("#D19A66"), Tag = H("#E97F87"), Attribute = H("#D19A66"), Punctuation = H("#ABB2BF"),
+        DiffAddedText = H("#98C379"), DiffRemovedText = H("#E97F87"),
+    };
+
+    public static readonly PaletteDefinition OneLight = new()
+    {
+        Id = "one-light", Name = "One", Family = "One", Variant = PaletteVariant.Light,
+        Description = "Atom's One Light — clean neutral paper.",
+        Surface = H("#FAFAFA"), SurfaceSunken = H("#EAEAEB"), SurfaceRaised = H("#FFFFFF"),
+        Overlay = H("#FFFFFF"), Border = H("#D4D4D6"), Separator = H("#E4E4E6"), ButtonBg = H("#ECECEE"),
+        TextPrimary = H("#383A42"), TextTitle = H("#1F2024"), TextMuted = H("#6A6C74"), TextFaint = H("#A0A1A7"),
+        Accent = H("#295AC4"), AccentHover = H("#1E469E"), OnAccent = H("#FFFFFF"), Link = H("#1E469E"),
+        Success = H("#2F6B2E"), Warning = H("#986801"), Danger = H("#C42B1C"), Info = H("#295AC4"), Dev = H("#A626A4"),
+        EditorBg = H("#FFFFFF"), EditorFg = H("#383A42"), EditorGutterFg = H("#A0A1A7"),
+        Keyword = H("#A626A4"), Str = H("#2F6B2E"), Number = H("#986801"), Comment = H("#6E6F76"),
+        Function = H("#295AC4"), Type = H("#986801"), Variable = H("#383A42"), Operator = H("#0A6C93"),
+        Constant = H("#986801"), Tag = H("#2F6B2E"), Attribute = H("#986801"), Punctuation = H("#383A42"),
+        DiffAddedText = H("#2F6B2E"), DiffRemovedText = H("#C42B1C"),
+    };
+
+    // ═══════════════════════════════════════════════════════════════════════
+    //  Tokyo Night — deep indigo dark + a soft "Day" companion.
+    // ═══════════════════════════════════════════════════════════════════════
+    public static readonly PaletteDefinition TokyoNightDark = new()
+    {
+        Id = "tokyonight-dark", Name = "Tokyo Night", Family = "Tokyo Night", Variant = PaletteVariant.Dark,
+        Description = "Deep indigo night; saturated but low-glare.",
+        Surface = H("#1A1B26"), SurfaceSunken = H("#16161E"), SurfaceRaised = H("#24283B"),
+        Overlay = H("#16161E"), Border = H("#2E3350"), Separator = H("#24283B"), ButtonBg = H("#2E3350"),
+        TextPrimary = H("#C0CAF5"), TextTitle = H("#D5DBF5"), TextMuted = H("#9AA5CE"), TextFaint = H("#565F89"),
+        Accent = H("#7AA2F7"), AccentHover = H("#A2BEF9"), OnAccent = H("#16161E"), Link = H("#7AA2F7"),
+        Success = H("#9ECE6A"), Warning = H("#E0AF68"), Danger = H("#F7768E"), Info = H("#7DCFFF"), Dev = H("#BB9AF7"),
+        EditorBg = H("#1A1B26"), EditorFg = H("#C0CAF5"), EditorGutterFg = H("#565F89"),
+        Keyword = H("#BB9AF7"), Str = H("#9ECE6A"), Number = H("#FF9E64"), Comment = H("#838CBB"),
+        Function = H("#7AA2F7"), Type = H("#73DACA"), Variable = H("#C0CAF5"), Operator = H("#7DCFFF"),
+        Constant = H("#FF9E64"), Tag = H("#F7768E"), Attribute = H("#E0AF68"), Punctuation = H("#A9B1D6"),
+        DiffAddedText = H("#9ECE6A"), DiffRemovedText = H("#F7768E"),
+    };
+
+    public static readonly PaletteDefinition TokyoNightLight = new()
+    {
+        Id = "tokyonight-light", Name = "Tokyo Night", Family = "Tokyo Night", Variant = PaletteVariant.Light,
+        Description = "Tokyo Night Day — muted cool paper companion.",
+        Surface = H("#E1E2E7"), SurfaceSunken = H("#D4D6E0"), SurfaceRaised = H("#EDEEF2"),
+        Overlay = H("#EDEEF2"), Border = H("#C4C8D8"), Separator = H("#D4D6E0"), ButtonBg = H("#D8DAE6"),
+        TextPrimary = H("#2C304D"), TextTitle = H("#1A1D33"), TextMuted = H("#565A7E"), TextFaint = H("#848CB5"),
+        Accent = H("#1E63C4"), AccentHover = H("#164D9E"), OnAccent = H("#FFFFFF"), Link = H("#164D9E"),
+        Success = H("#4C6630"), Warning = H("#79591F"), Danger = H("#B02749"), Info = H("#007197"), Dev = H("#7A3EC0"),
+        EditorBg = H("#F7F8FB"), EditorFg = H("#2C304D"), EditorGutterFg = H("#848CB5"),
+        Keyword = H("#7A3EC0"), Str = H("#587539"), Number = H("#A15400"), Comment = H("#616684"),
+        Function = H("#1E63C4"), Type = H("#0C6E5B"), Variable = H("#2C304D"), Operator = H("#007197"),
+        Constant = H("#B15C00"), Tag = H("#C22F52"), Attribute = H("#8C6C3E"), Punctuation = H("#2C304D"),
+        DiffAddedText = H("#587539"), DiffRemovedText = H("#C22F52"),
+    };
+
+    // ═══════════════════════════════════════════════════════════════════════
+    //  Rosé Pine — soft, low-contrast and aesthetic; "main" dark + "Dawn" light.
+    // ═══════════════════════════════════════════════════════════════════════
+    public static readonly PaletteDefinition RosePineDark = new()
+    {
+        Id = "rosepine-dark", Name = "Rosé Pine", Family = "Rosé Pine", Variant = PaletteVariant.Dark,
+        Description = "Muted rose-and-pine dark; gentle, low-contrast, cosy.",
+        Surface = H("#191724"), SurfaceSunken = H("#14121F"), SurfaceRaised = H("#1F1D2E"),
+        Overlay = H("#26233A"), Border = H("#2E2B40"), Separator = H("#26233A"), ButtonBg = H("#2E2B40"),
+        TextPrimary = H("#E0DEF4"), TextTitle = H("#F0EFFA"), TextMuted = H("#A9A5C4"), TextFaint = H("#6E6A86"),
+        Accent = H("#C4A7E7"), AccentHover = H("#D6C2F0"), OnAccent = H("#191724"), Link = H("#C4A7E7"),
+        Success = H("#9CCFD8"), Warning = H("#F6C177"), Danger = H("#EB6F92"), Info = H("#9CCFD8"), Dev = H("#C4A7E7"),
+        EditorBg = H("#191724"), EditorFg = H("#E0DEF4"), EditorGutterFg = H("#6E6A86"),
+        Keyword = H("#6F9DB9"), Str = H("#F6C177"), Number = H("#EBBCBA"), Comment = H("#8A87A3"),
+        Function = H("#9CCFD8"), Type = H("#C4A7E7"), Variable = H("#E0DEF4"), Operator = H("#9CCFD8"),
+        Constant = H("#F6C177"), Tag = H("#EB6F92"), Attribute = H("#F6C177"), Punctuation = H("#A9A5C4"),
+        DiffAddedText = H("#9CCFD8"), DiffRemovedText = H("#EB6F92"),
+    };
+
+    public static readonly PaletteDefinition RosePineLight = new()
+    {
+        Id = "rosepine-light", Name = "Rosé Pine", Family = "Rosé Pine", Variant = PaletteVariant.Light,
+        Description = "Rosé Pine Dawn — warm blush light; soft and unhurried.",
+        Surface = H("#FAF4ED"), SurfaceSunken = H("#F2E9E1"), SurfaceRaised = H("#FFFAF3"),
+        Overlay = H("#F2E9E1"), Border = H("#E4D8CC"), Separator = H("#EFE6DC"), ButtonBg = H("#EFE0D4"),
+        TextPrimary = H("#575279"), TextTitle = H("#3F3A5C"), TextMuted = H("#6E6A86"), TextFaint = H("#9893A5"),
+        Accent = H("#75608F"), AccentHover = H("#5C4A73"), OnAccent = H("#FFFAF3"), Link = H("#5C4A73"),
+        Success = H("#3D7883"), Warning = H("#8A6510"), Danger = H("#9E4A62"), Info = H("#286983"), Dev = H("#7A5E96"),
+        EditorBg = H("#FFFAF3"), EditorFg = H("#575279"), EditorGutterFg = H("#9893A5"),
+        Keyword = H("#286983"), Str = H("#8A6510"), Number = H("#9E4A62"), Comment = H("#6E6A86"),
+        Function = H("#3D7883"), Type = H("#7A5E96"), Variable = H("#575279"), Operator = H("#3D7883"),
+        Constant = H("#8A6510"), Tag = H("#9E4A62"), Attribute = H("#8A6510"), Punctuation = H("#575279"),
+        DiffAddedText = H("#3D7883"), DiffRemovedText = H("#9E4A62"),
+    };
+
     /// <summary>Every built-in palette, grouped light/dark by family in menu order.</summary>
     public static readonly IReadOnlyList<PaletteDefinition> All = new[]
     {
@@ -237,6 +342,9 @@ public static class PaletteCatalog
         SolarizedDark, SolarizedLight,
         NordDark, NordLight,
         GruvboxDark, GruvboxLight,
+        OneDark, OneLight,
+        TokyoNightDark, TokyoNightLight,
+        RosePineDark, RosePineLight,
         SepiaDark, SepiaLight,
         ContrastDark, ContrastLight,
     };

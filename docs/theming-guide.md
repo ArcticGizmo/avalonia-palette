@@ -78,9 +78,20 @@ ThemeManager.Current.Apply(PaletteCatalog.SolarizedLight); // by definition
 ThemeManager.Current.PaletteChanged += (_, palette) => Save(palette.Id);
 ```
 
-`PaletteCatalog.All` enumerates the 12 built-ins; `PaletteCatalog.Family("Nord")` returns a
+`PaletteCatalog.All` enumerates the 18 built-ins; `PaletteCatalog.Family("Nord")` returns a
 family's light+dark pair. Bind `All` to a `ComboBox` and you have a palette picker (see
 `MainWindowViewModel` in the sample).
+
+### Remember the choice (optional)
+
+`ThemePreferences` persists the selected palette to a tiny JSON file under the user's app-data
+folder — no dependency, best-effort, never throws:
+
+```csharp
+var prefs = new ThemePreferences("MyApp");             // folder name under %APPDATA%
+ThemeManager.Initialize(this, prefs.LoadOrDefault());  // restore last choice (or default)
+ThemeManager.Current.PaletteChanged += (_, p) => prefs.Save(p.Id);
+```
 
 ## 5. Already using the house palette?
 

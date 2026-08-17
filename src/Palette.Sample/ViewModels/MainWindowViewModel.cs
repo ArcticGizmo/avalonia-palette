@@ -27,6 +27,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase
             new OverviewViewModel(),
             new LayoutViewModel(),
             new EditorViewModel(),
+            new EditorLiveViewModel(),
             new DiffViewModel(),
             new ControlsViewModel(),
             new PalettesViewModel(),
@@ -35,9 +36,9 @@ public sealed partial class MainWindowViewModel : ViewModelBase
         NavItems.Add(new NavHeaderViewModel("Explore"));
         foreach (var p in _pages.Take(2)) NavItems.Add(p);
         NavItems.Add(new NavHeaderViewModel("Editing surfaces"));
-        foreach (var p in _pages.Skip(2).Take(2)) NavItems.Add(p);
+        foreach (var p in _pages.Skip(2).Take(3)) NavItems.Add(p);
         NavItems.Add(new NavHeaderViewModel("Components"));
-        foreach (var p in _pages.Skip(4)) NavItems.Add(p);
+        foreach (var p in _pages.Skip(5)) NavItems.Add(p);
 
         _currentPage = _pages[0];
         _currentPage.IsActive = true;
