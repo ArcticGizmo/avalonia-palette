@@ -1,4 +1,4 @@
-using Palette.Theming;
+using ArcticGizmo.Avalonia.Palette;
 
 namespace Palette.Sample;
 
@@ -20,7 +20,7 @@ internal static class VerifyPalettes
             foreach (var c in report.Checks)
             {
                 var isBorder = c.Label.Contains("border", StringComparison.OrdinalIgnoreCase);
-                var below = c.Ratio < Palette.Theming.Color.Contrast.AaText;
+                var below = c.Ratio < ArcticGizmo.Avalonia.Palette.Color.Contrast.AaText;
                 var mark = isBorder ? "  " : below ? "!!" : "ok";
                 if (below && !isBorder) failures++;
                 Console.WriteLine($"  {mark} {c.RatioText,-8} {c.Label}");

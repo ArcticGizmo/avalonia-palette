@@ -1,4 +1,4 @@
-namespace Palette.Theming;
+namespace ArcticGizmo.Avalonia.Palette;
 
 /// <summary>
 /// The runtime set of palettes available to an app: the built-ins from

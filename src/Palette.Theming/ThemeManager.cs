@@ -2,9 +2,9 @@ using Avalonia;
 using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Styling;
-using Palette.Theming.Color;
+using ArcticGizmo.Avalonia.Palette.Color;
 
-namespace Palette.Theming;
+namespace ArcticGizmo.Avalonia.Palette;
 
 /// <summary>
 /// Owns the live set of themed brushes and swaps palettes at runtime.

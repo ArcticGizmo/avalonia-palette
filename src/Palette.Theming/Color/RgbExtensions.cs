@@ -1,6 +1,6 @@
 using Avalonia.Media;
 
-namespace Palette.Theming.Color;
+namespace ArcticGizmo.Avalonia.Palette.Color;
 
 /// <summary>Bridges the framework-agnostic <see cref="Rgb"/> to Avalonia's media types.</summary>
 public static class RgbExtensions

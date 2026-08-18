@@ -1,8 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Palette.Theming.Color;
+using ArcticGizmo.Avalonia.Palette.Color;
 
-namespace Palette.Theming;
+namespace ArcticGizmo.Avalonia.Palette;
 
 /// <summary>
 /// Serialises a <see cref="PaletteDefinition"/> to/from JSON so custom palettes can be saved,

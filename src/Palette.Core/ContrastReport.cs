@@ -1,6 +1,6 @@
-using Palette.Theming.Color;
+using ArcticGizmo.Avalonia.Palette.Color;
 
-namespace Palette.Theming;
+namespace ArcticGizmo.Avalonia.Palette;
 
 /// <summary>One foreground/background pairing and the WCAG result it achieves.</summary>
 public sealed record ContrastCheck(string Label, Rgb Foreground, Rgb Background)

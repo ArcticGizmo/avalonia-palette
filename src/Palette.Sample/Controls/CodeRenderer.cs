@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Palette.Theming;
+using ArcticGizmo.Avalonia.Palette;
 
 namespace Palette.Sample.Controls;
 

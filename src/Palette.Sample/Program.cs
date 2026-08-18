@@ -1,5 +1,5 @@
 using Avalonia;
-using Palette.Theming;
+using ArcticGizmo.Avalonia.Palette;
 
 namespace Palette.Sample;
 

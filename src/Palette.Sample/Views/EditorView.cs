@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Palette.Sample.Controls;
-using Palette.Theming;
+using ArcticGizmo.Avalonia.Palette;
 
 namespace Palette.Sample.Views;
 

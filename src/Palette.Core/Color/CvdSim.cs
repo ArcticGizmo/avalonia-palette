@@ -1,4 +1,4 @@
-namespace Palette.Theming.Color;
+namespace ArcticGizmo.Avalonia.Palette.Color;
 
 /// <summary>A type of colour-vision deficiency to simulate.</summary>
 public enum Cvd

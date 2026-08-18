@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>ArcticGizmo.Avalonia.Palette</RootNamespace>
+    <AssemblyName>ArcticGizmo.Avalonia.Palette.Core</AssemblyName>
+    <!-- UI-free core: colour maths, WCAG, palette model + catalog. No Avalonia dependency,
+         so non-UI code, headless tests and alternate app heads can consume the model. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <!-- ── NuGet package metadata ──────────────────────────────────────────
+       The Avalonia-facing package (ArcticGizmo.Avalonia.Palette) depends on this. -->
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>ArcticGizmo.Avalonia.Palette.Core</PackageId>
+    <Version>0.3.0</Version>
+    <Authors>ArcticGizmo</Authors>
+    <Company>ArcticGizmo</Company>
+    <Title>Avalonia Palette Core — UI-free colour model + WCAG</Title>
+    <Description>The UI-free core of ArcticGizmo.Avalonia.Palette: the Rgb colour type, WCAG contrast maths (incl. AdjustToMeet), colour-vision-deficiency simulation, the semantic token contract, the palette model + derivation, the 18 built-in palettes, the registry, and JSON/share-code serialisation. No Avalonia dependency, so it can be consumed by non-UI cores, headless tests and alternate heads.</Description>
+    <PackageTags>theme;theming;palette;colors;wcag;accessibility;color-contrast;colorblind</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/ArcticGizmo/avalonia-pallete</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ArcticGizmo/avalonia-pallete</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>0.3.0 — split out of ArcticGizmo.Avalonia.Palette as a UI-free package. Namespace is now ArcticGizmo.Avalonia.Palette (was Palette.Theming). Adds consumer-registerable/pinned tokens (TokenSpec), a compact share code, and PaletteCatalog.Find.</PackageReleaseNotes>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

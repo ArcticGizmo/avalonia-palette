@@ -1,6 +1,6 @@
-using Palette.Theming.Color;
+using ArcticGizmo.Avalonia.Palette.Color;
 
-namespace Palette.Theming;
+namespace ArcticGizmo.Avalonia.Palette;
 
 /// <summary>
 /// The built-in palettes: six families, each with a light and a dark variant, tuned for

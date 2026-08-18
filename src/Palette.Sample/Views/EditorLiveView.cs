@@ -5,7 +5,7 @@ using Avalonia.Media;
 using AvaloniaEdit;
 using AvaloniaEdit.Document;
 using Palette.Sample.Controls;
-using Palette.Theming;
+using ArcticGizmo.Avalonia.Palette;
 
 namespace Palette.Sample.Views;
 
@@ -19,7 +19,7 @@ public sealed class EditorLiveView : UserControl
     private readonly TextEditor _editor;
 
     private const string Sample =
-        "using Palette.Theming;\n\n" +
+        "using ArcticGizmo.Avalonia.Palette;\n\n" +
         "// A real, editable AvaloniaEdit surface — type here and swap palettes.\n" +
         "public sealed class Greeter\n" +
         "{\n" +

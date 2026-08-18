@@ -1,4 +1,4 @@
-namespace Palette.Theming;
+namespace ArcticGizmo.Avalonia.Palette;
 
 /// <summary>
 /// The semantic token contract. Every palette resolves to a value for each of these

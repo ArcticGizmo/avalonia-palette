@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Palette.Theming.Color;
+namespace ArcticGizmo.Avalonia.Palette.Color;
 
 /// <summary>Serialises <see cref="Rgb"/> as a compact <c>"#RRGGBB"</c> hex string.</summary>
 public sealed class RgbJsonConverter : JsonConverter<Rgb>

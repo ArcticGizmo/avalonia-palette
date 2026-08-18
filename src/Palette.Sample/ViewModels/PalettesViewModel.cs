@@ -2,8 +2,8 @@ using System.Collections.ObjectModel;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Palette.Theming;
-using Palette.Theming.Color;
+using ArcticGizmo.Avalonia.Palette;
+using ArcticGizmo.Avalonia.Palette.Color;
 
 namespace Palette.Sample.ViewModels;
 
