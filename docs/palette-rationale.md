@@ -21,7 +21,7 @@ checked by `dotnet run --project src/Palette.Sample -- --verify`.
 | 1.4.6 Contrast (Enhanced), normal text | **7:1** | the High-Contrast family targets this |
 
 Definitions of *relative luminance* and *contrast ratio* are implemented verbatim from the W3C
-spec in [`Color/Contrast.cs`](../src/Palette.Theming/Color/Contrast.cs).
+spec in [`Color/Contrast.cs`](../src/Palette.Core/Color/Contrast.cs).
 
 - WCAG 2.1 SC 1.4.3 Contrast (Minimum): <https://www.w3.org/TR/WCAG21/#contrast-minimum>
 - WCAG 2.1 SC 1.4.6 Contrast (Enhanced): <https://www.w3.org/TR/WCAG21/#contrast-enhanced>
@@ -55,7 +55,7 @@ washes (not bright fills), and syntax hues are separated by colour rather than b
 > Note: canonical Solarized deliberately runs some pairs (notably comments) *below* AA. Because
 > this template prioritises WCAG, our Solarized variants nudge those specific values up to reach
 > AA while keeping the hue. If you want pixel-exact canonical Solarized, override the seed values
-> in [`PaletteCatalog.cs`](../src/Palette.Theming/PaletteCatalog.cs).
+> in [`PaletteCatalog.cs`](../src/Palette.Core/PaletteCatalog.cs).
 
 ## Why a warm / low-blue option (Sepia)
 

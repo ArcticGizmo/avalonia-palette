@@ -1,9 +1,9 @@
-namespace Palette.Theming;
+namespace ArcticGizmo.Avalonia.Palette;
 
 /// <summary>
 /// The runtime set of palettes available to an app: the built-ins from
 /// <see cref="PaletteCatalog"/> plus any user-defined ones added at runtime. This is what UIs
-/// (palette pickers, galleries) and <see cref="ThemeManager"/> resolve ids against, so a custom
+/// (palette pickers, galleries) and <c>ThemeManager</c> resolve ids against, so a custom
 /// palette behaves exactly like a built-in once added.
 /// </summary>
 public sealed class PaletteRegistry

@@ -1,20 +1,30 @@
-# Distributing Palette.Theming
+# Distributing the Palette packages
 
-`Palette.Theming` is a normal .NET library, so other Avalonia apps consume it the same way they
-consume any dependency. Pick the channel that matches how widely you want to share it.
+The library now ships as **two** NuGet packages, so other Avalonia apps consume it the same way
+they consume any dependency. Pick the channel that matches how widely you want to share it.
 
-Build the package first:
+- **`ArcticGizmo.Avalonia.Palette`** — the Avalonia-facing package (the `ThemeManager` live-swap
+  engine + brush bridge). This is what app consumers install; it pulls in the Core package.
+- **`ArcticGizmo.Avalonia.Palette.Core`** — the UI-free model (colour maths, WCAG, token contract,
+  palette model + catalog). No Avalonia dependency; non-UI or test code can reference it alone.
+
+Both share the same `<Version>` (currently `0.3.0`). Build them together by packing the solution:
 
 ```bash
-dotnet pack src/Palette.Theming -c Release -o artifacts
-# → artifacts/ArcticGizmo.Avalonia.Palette.0.1.0.nupkg  (+ .snupkg symbols)
+dotnet pack Palette.slnx -c Release -o artifacts
+# → artifacts/ArcticGizmo.Avalonia.Palette.0.3.0.nupkg
+# → artifacts/ArcticGizmo.Avalonia.Palette.Core.0.3.0.nupkg   (+ .snupkg symbols for each)
 ```
 
-> Package id: `ArcticGizmo.Avalonia.Palette` (assembly/namespace stays `Palette.Theming`).
+> Package ids: `ArcticGizmo.Avalonia.Palette` and `ArcticGizmo.Avalonia.Palette.Core`. The
+> assembly/namespace is `ArcticGizmo.Avalonia.Palette` (was `Palette.Theming` before v0.3.0).
+> Packing just `src/Palette.Theming` builds only the Avalonia package (Core comes in as a
+> dependency reference) — pack the solution to produce both `.nupkg`s.
 
-The package metadata (id, version, description, license, README) lives in
-`src/Palette.Theming/Palette.Theming.csproj` — bump `<Version>` for each release and update
-`<RepositoryUrl>` / `<PackageProjectUrl>` to your real repo before publishing publicly.
+Each package's metadata (id, version, description, license, README) lives in its `.csproj`
+(`src/Palette.Theming/Palette.Theming.csproj` and `src/Palette.Core/Palette.Core.csproj`) — bump
+`<Version>` in **both** for each release (keep them in lockstep) and update `<RepositoryUrl>` /
+`<PackageProjectUrl>` to your real repo before publishing publicly.
 
 ---
 
@@ -34,15 +44,15 @@ plain `--source` is ignored — add a `nuget.config` next to the consumer's `.cs
   </packageSources>
   <packageSourceMapping>
     <packageSource key="nuget.org"><package pattern="*" /></packageSource>
-    <packageSource key="palette-local"><package pattern="Palette.*" /></packageSource>
+    <packageSource key="palette-local"><package pattern="ArcticGizmo.Avalonia.Palette*" /></packageSource>
   </packageSourceMapping>
 </configuration>
 ```
 
-Then:
+Then (the Core package is restored from the same feed transitively):
 
 ```bash
-dotnet add package Palette.Theming
+dotnet add package ArcticGizmo.Avalonia.Palette
 ```
 
 ---
@@ -56,10 +66,12 @@ Good for sharing across a team without going public.
 dotnet nuget add source "https://nuget.pkg.github.com/<OWNER>/index.json" \
   --name github --username <OWNER> --password <PAT> --store-password-in-clear-text
 
-dotnet nuget push artifacts/ArcticGizmo.Avalonia.Palette.0.1.0.nupkg --source github --api-key <PAT>
+# push both packages (glob covers Core too)
+dotnet nuget push "artifacts/ArcticGizmo.Avalonia.Palette*.0.3.0.nupkg" --source github --api-key <PAT>
 ```
 
-Consumers add the same feed (with their own PAT) and `dotnet add package ArcticGizmo.Avalonia.Palette`.
+Consumers add the same feed (with their own PAT) and `dotnet add package ArcticGizmo.Avalonia.Palette`
+— the Core package restores from the same feed transitively.
 
 ---
 
@@ -69,8 +81,9 @@ Public, and **keyless**: instead of storing a long-lived API key, GitHub Actions
 short-lived (~1 hour) key from an OIDC token at push time. There is no secret to leak or rotate.
 The ready-made workflow is at [`.github/workflows/publish.yml`](../.github/workflows/publish.yml).
 
-**Irreversible-ish**: the id `ArcticGizmo.Avalonia.Palette` is claimed by your account on first
-publish and a version can only be unlisted, not deleted.
+**Irreversible-ish**: each id (`ArcticGizmo.Avalonia.Palette` **and**
+`ArcticGizmo.Avalonia.Palette.Core`) is claimed by your account on first publish, and a version can
+only be unlisted, not deleted.
 
 ### One-time setup
 
@@ -86,10 +99,22 @@ publish and a version can only be unlisted, not deleted.
 
    > If you don't see **Trusted Publishing**, it's still rolling out to accounts — use the
    > API-key fallback below meanwhile.
+   >
+   > **Two package ids now, but still one policy.** The workflow packs and pushes **both**
+   > `ArcticGizmo.Avalonia.Palette` and `ArcticGizmo.Avalonia.Palette.Core`. A trusted-publishing
+   > policy has **no package-name field** — it's scoped by repository owner + repository + workflow
+   > (+ optional environment) and "applies to all packages owned by the selected owner"
+   > ([docs](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing#policy-ownership)).
+   > So your existing policy already covers the new `Core` id; you do **not** need a second policy.
+   > The only thing to confirm is **id availability**: the first push creates
+   > `ArcticGizmo.Avalonia.Palette.Core`, which succeeds as long as that id isn't already owned by
+   > another account and isn't blocked by a reserved id prefix held elsewhere (owning
+   > `ArcticGizmo.Avalonia.Palette` makes that a non-issue unless a separate `ArcticGizmo.*` prefix
+   > reservation applies).
 3. **GitHub repo secret** — add `NUGET_USER` = your nuget.org **profile name** (not your email).
    The workflow passes it to the `NuGet/login` action.
-4. You do **not** pre-create the package page; the first successful push creates it and assigns
-   ownership to your account.
+4. You do **not** pre-create the package pages; the first successful push creates each (both ids)
+   and assigns ownership to your account.
 
 > **Private-repo note:** a new policy is "pending activation" for 7 days until a first publish
 > locks it to your repo/owner IDs (prevents repo-name resurrection attacks). Public repos activate
@@ -98,22 +123,25 @@ publish and a version can only be unlisted, not deleted.
 ### Publish
 
 ```bash
-# bump <Version> in the csproj if you want, then tag and push:
-git tag v0.1.0
-git push origin v0.1.0
+# bump <Version> in BOTH csprojs if you want, then tag and push:
+git tag v0.3.0
+git push origin v0.3.0
 ```
 
-The workflow runs the WCAG gate, packs with the tag's version, exchanges the OIDC token for a
-temporary key, and pushes the package + symbols. Watch it under the repo's **Actions** tab.
-Installable a few minutes later with `dotnet add package ArcticGizmo.Avalonia.Palette`.
+The workflow runs the WCAG gate, packs the solution (`dotnet pack Palette.slnx`) with the tag's
+version — producing **both** `ArcticGizmo.Avalonia.Palette` and `ArcticGizmo.Avalonia.Palette.Core`
+— exchanges the OIDC token for a temporary key, and pushes both packages + symbols. Watch it under
+the repo's **Actions** tab. Installable a few minutes later with
+`dotnet add package ArcticGizmo.Avalonia.Palette`.
 
 ### API-key fallback (if Trusted Publishing isn't available to your account yet)
 
-Create an API key at **Account → API Keys** scoped to glob `ArcticGizmo.*`, then:
+Create an API key at **Account → API Keys** scoped to glob `ArcticGizmo.*` (covers both ids), then
+pack the solution and push both packages:
 
 ```bash
-dotnet pack src/Palette.Theming -c Release -o artifacts
-dotnet nuget push artifacts/ArcticGizmo.Avalonia.Palette.0.1.0.nupkg \
+dotnet pack Palette.slnx -c Release -o artifacts
+dotnet nuget push "artifacts/ArcticGizmo.Avalonia.Palette*.0.3.0.nupkg" \
   --source https://api.nuget.org/v3/index.json --api-key <NUGET_API_KEY>
 ```
 

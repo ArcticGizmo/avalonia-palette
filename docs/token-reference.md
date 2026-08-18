@@ -7,7 +7,12 @@ name**. Consume from XAML with `{DynamicResource <Key>}` or from code with
 
 Keys tagged **(house)** match the names used across the author's existing apps, so they drop in
 unchanged. Constant names (left column) live in
-[`ThemeTokens.cs`](../src/Palette.Theming/ThemeTokens.cs).
+[`ThemeTokens.cs`](../src/Palette.Core/ThemeTokens.cs) (namespace `ArcticGizmo.Avalonia.Palette`).
+
+> This is the built-in token contract, but it isn't closed: an app can register its **own** tokens
+> before `ThemeManager.Initialize` via `ThemeManager.RegisterTokens(...)` — `TokenSpec.Derived(key,
+> def => rgb)` themes with the palette, `TokenSpec.Fixed(key, rgb)` stays constant across swaps, and
+> a spec whose key matches a built-in overrides it.
 
 ## Surfaces & layout
 
@@ -119,6 +124,7 @@ unchanged. Constant names (left column) live in
 | `Warning` | `WarnBrush` **(house)** | Warning text/icon |
 | `WarningBg` | `WarningBgBrush` | Warning banner background |
 | `Danger` | `DangerBrush` **(house)** | Error/destructive text/icon |
+| `Error` | `DangerBrush` | Alias of `Danger` (same key) — clearer wording for non-IDE apps |
 | `DangerBg` | `DangerBgBrush` | Error banner background |
 | `Info` | `InfoBrush` | Info text/icon |
 | `InfoBg` | `InfoBgBrush` | Info banner background |
@@ -127,7 +133,7 @@ unchanged. Constant names (left column) live in
 ## Deriving vs. seeding
 
 A palette author only specifies ~33 **seed** roles in
-[`PaletteDefinition`](../src/Palette.Theming/PaletteDefinition.cs); the rest (hover states, tints,
+[`PaletteDefinition`](../src/Palette.Core/PaletteDefinition.cs); the rest (hover states, tints,
 diff washes, selection, current-line, find matches) are **derived** in `Resolve()`. Three derived
 tokens can be pinned when a scheme's canonical value matters: `SelectionOverride`,
 `CurrentLineOverride`, `CaretOverride`.

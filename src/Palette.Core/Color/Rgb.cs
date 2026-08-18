@@ -1,11 +1,11 @@
-namespace Palette.Theming.Color;
+namespace ArcticGizmo.Avalonia.Palette.Color;
 
 /// <summary>
 /// A UI-framework-agnostic 8-bit-per-channel RGB colour.
 /// Kept free of any Avalonia dependency so the colour maths and WCAG
 /// utilities can be unit-tested and reused outside a running UI.
-/// Conversions to <see cref="global::Avalonia.Media.Color"/> live in
-/// <c>RgbExtensions</c>.
+/// Conversions to <c>Avalonia.Media.Color</c> live in <c>RgbExtensions</c>
+/// (in the Avalonia-facing package).
 /// </summary>
 public readonly record struct Rgb(byte R, byte G, byte B)
 {

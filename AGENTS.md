@@ -9,7 +9,17 @@ a project that **depends on** the `ArcticGizmo.Avalonia.Palette` NuGet package, 
 ## Using the package — `ArcticGizmo.Avalonia.Palette`
 
 Runtime-swappable, WCAG-AA colour palettes for Avalonia. **NuGet id:** `ArcticGizmo.Avalonia.Palette`.
-**Namespace / assembly:** `Palette.Theming`.
+**Namespace / assembly:** `ArcticGizmo.Avalonia.Palette` — so `using ArcticGizmo.Avalonia.Palette;`.
+
+> **Namespace note.** The root namespace is `ArcticGizmo.Avalonia.Palette` (it was `Palette.Theming`
+> before v0.3.0). It is deliberately *not* a bare `Palette`, so it won't collide with a consumer's
+> own `Palette` type or namespace — reference it directly, no `extern alias` or aliasing needed.
+> The UI-free types (`Rgb`, `Contrast`, `ThemeTokens`, `PaletteDefinition`, `PaletteCatalog`, …)
+> live in the same namespace but ship in the `ArcticGizmo.Avalonia.Palette.Core` package, which the
+> Avalonia package references transitively — a single `using` covers both.
+>
+> **String resource keys are unchanged** — `FormBgBrush`, `AccentBrush`, `OkBrush`, etc. are the
+> same, so `{DynamicResource FormBgBrush}` in XAML is unaffected. Only the C# namespace moved.
 
 ### Rules (do these; avoid the anti-patterns)
 
@@ -47,8 +57,19 @@ Runtime-swappable, WCAG-AA colour palettes for Avalonia. **NuGet id:** `ArcticGi
    `ThemeManager.Current.FollowOsTheme(true)` tracks system light/dark;
    `ThemeManager.Current.SetCvd(Cvd.Deuteranopia)` previews colour-blindness;
    `Contrast.AdjustToMeet(fg, bg)` nudges a colour to WCAG AA.
-9. **Keep AA.** If you add or edit a palette in a fork, run the gate — it exits non-zero on any
-   sub-AA text pair: `dotnet run --project src/Palette.Sample -- --verify`.
+9. **Add your own tokens (before `Initialize`):** `ThemeManager.RegisterTokens(...)` with
+   `TokenSpec.Derived(key, def => rgb)` (themes with the palette) or `TokenSpec.Fixed(key, rgb)`
+   (constant across swaps). A spec whose key matches a built-in overrides it — e.g. pin the shipped
+   Danger colour. Read a token's live colour framework-agnostically with
+   `ThemeManager.Current.Rgb(token)` (symmetric to `Brush()` / `Color()`) for owner-drawn work.
+10. **Other knobs:** `ThemeManager.Initialize(this, palette, manageFluentVariant: false)` opts out
+    of the engine overwriting `Application.RequestedThemeVariant` on each swap; `ThemeTokens.Error`
+    is an alias of `Danger` (same `"DangerBrush"` key), clearer for non-IDE apps;
+    `PaletteCatalog.Find(id)` is a non-throwing lookup (returns null; `ById` still throws);
+    `PaletteCodec.ToShareCode(palette)` / `FromShareCode(code)` produce/parse compact single-line
+    `pal1:` codes for copy-paste + QR sharing (JSON methods still available).
+11. **Keep AA.** If you add or edit a palette in a fork, run the gate — it exits non-zero on any
+    sub-AA text pair: `dotnet run --project src/Palette.Sample -- --verify`.
 
 ### Minimal wire-up
 

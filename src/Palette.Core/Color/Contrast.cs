@@ -1,4 +1,4 @@
-namespace Palette.Theming.Color;
+namespace ArcticGizmo.Avalonia.Palette.Color;
 
 /// <summary>
 /// WCAG 2.1 contrast calculations.

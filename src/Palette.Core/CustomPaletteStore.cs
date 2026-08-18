@@ -1,4 +1,4 @@
-namespace Palette.Theming;
+namespace ArcticGizmo.Avalonia.Palette;
 
 /// <summary>
 /// Persists user-defined palettes to a JSON file under the user's application-data folder, and

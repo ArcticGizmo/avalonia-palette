@@ -11,10 +11,12 @@ switcher, and a built-in designer for user themes.
 ![WCAG](https://img.shields.io/badge/contrast-WCAG%20AA-4ADE80)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](#license)
 
-Two projects: **`Palette.Theming`** (the reusable library you install) and **`Palette.Sample`**
-(a runnable demo of everything). Install the library, call one line at startup, and paint through
-~70 semantic tokens. Apps already using the house token names (`FormBgBrush`, `AccentBrush`,
-`OkBrush`, …) get light mode and live swapping for free.
+The reusable library ships as two NuGet packages — **`ArcticGizmo.Avalonia.Palette`** (the
+Avalonia-facing library you install) and **`ArcticGizmo.Avalonia.Palette.Core`** (the UI-free
+colour/WCAG/palette model it layers on, and which non-UI or test code can reference alone) —
+plus **`Palette.Sample`**, a runnable demo of everything. Install the library, call one line at
+startup, and paint through ~70 semantic tokens. Apps already using the house token names
+(`FormBgBrush`, `AccentBrush`, `OkBrush`, …) get light mode and live swapping for free.
 
 | Aurora · Dark (overview) | Aurora · Light (editor) | Theme designer |
 |---|---|---|
@@ -38,7 +40,10 @@ Two projects: **`Palette.Theming`** (the reusable library you install) and **`Pa
   **Fix**, colour-blindness preview, and save / export / import.
 - **Accessibility built in** — a WCAG contrast report + auto-fix, colour-blindness simulation, and
   a headless `--verify` gate for CI.
-- **Quality-of-life** — follow the OS light/dark setting, and remember the user's choice.
+- **Extensible tokens** — register your app's own tokens (`ThemeManager.RegisterTokens` with
+  `TokenSpec.Derived`/`TokenSpec.Fixed`), or pin a built-in to a fixed colour.
+- **Quality-of-life** — follow the OS light/dark setting, remember the user's choice, opt out of
+  Fluent-variant management, and share palettes as compact `pal1:` codes (great for QR).
 
 ---
 
@@ -48,9 +53,11 @@ Two projects: **`Palette.Theming`** (the reusable library you install) and **`Pa
 dotnet add package ArcticGizmo.Avalonia.Palette
 ```
 
-> Package id: `ArcticGizmo.Avalonia.Palette` · assembly/namespace: `Palette.Theming`.
-> .NET 10 · Avalonia 12.0.5. Prefer no package? Reference the project directly, or see other
-> distribution options in [`docs/publishing.md`](docs/publishing.md).
+> Package id: `ArcticGizmo.Avalonia.Palette` · assembly/namespace: `ArcticGizmo.Avalonia.Palette`.
+> It pulls in `ArcticGizmo.Avalonia.Palette.Core` (the UI-free model) transitively — non-UI or
+> test code can install `...Core` alone. .NET 10 · Avalonia 12.x (floating `[12.0.5,13.0.0)`).
+> Prefer no package? Reference the project directly, or see other distribution options in
+> [`docs/publishing.md`](docs/publishing.md).
 
 ### Wire it up (three steps)
 
@@ -179,17 +186,20 @@ IntelliSense-driven agents get the API surface with no setup).
 ```
 Palette.slnx
 src/
-  Palette.Theming/          # the reusable library (install / reference this)
-    Color/                  #   Rgb, Contrast (WCAG + auto-fix), CvdSim, RgbExtensions
+  Palette.Core/             # UI-free model — pkg ArcticGizmo.Avalonia.Palette.Core (no Avalonia)
+    Color/                  #   Rgb, Contrast (WCAG + auto-fix), CvdSim
     ThemeTokens.cs          #   the ~70-key token contract
+    TokenSpec.cs            #   consumer-registerable / pinned token specs
     PaletteDefinition.cs    #   a palette's seed roles + derivation
     PaletteCatalog.cs       #   the 18 built-in palettes
     PaletteRegistry.cs      #   built-ins + custom palettes (runtime set)
-    PaletteCodec.cs         #   palette <-> JSON
+    PaletteCodec.cs         #   palette <-> JSON + compact share codes
     CustomPaletteStore.cs   #   persist user palettes
-    ThemeManager.cs         #   live swap engine (+ CVD filter, OS-follow)
     ContrastReport.cs       #   WCAG report model
     ThemePreferences.cs     #   optional per-user persistence
+  Palette.Theming/          # Avalonia layer — pkg ArcticGizmo.Avalonia.Palette (install this)
+    Color/                  #   RgbExtensions (Rgb -> Avalonia Color/brush bridge)
+    ThemeManager.cs         #   live swap engine (+ CVD filter, OS-follow)
   Palette.Sample/           # the demo app
     Styles/Controls.axaml   #   shared, copy-pasteable control styles
     Controls/               #   CodeRenderer (file/diff), TokenColorizer (AvaloniaEdit)

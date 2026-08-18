@@ -1,7 +1,10 @@
-# Palette.Theming
+# ArcticGizmo.Avalonia.Palette
 
 Runtime-swappable, **WCAG-AA** colour palettes for [Avalonia](https://avaloniaui.net) apps, tuned
-to reduce eye strain over a full working day.
+to reduce eye strain over a full working day. This is the **Avalonia-facing** package: it layers
+the live-swap `ThemeManager` (and the `Rgb`→brush bridge) over the UI-free
+[`ArcticGizmo.Avalonia.Palette.Core`](https://www.nuget.org/packages/ArcticGizmo.Avalonia.Palette.Core)
+package (colour maths, WCAG, token contract, palette model + catalog), which it pulls in for you.
 
 - **~70 semantic tokens** (surfaces, nav, editor, git-diff, syntax, buttons, status) published as
   `SolidColorBrush` resources.
@@ -18,14 +21,16 @@ to reduce eye strain over a full working day.
 dotnet add package ArcticGizmo.Avalonia.Palette
 ```
 
-(The package id is `ArcticGizmo.Avalonia.Palette`; the assembly/namespace is `Palette.Theming`.)
+(The package id and the assembly/namespace are both `ArcticGizmo.Avalonia.Palette`. Installing it
+restores `ArcticGizmo.Avalonia.Palette.Core` transitively; non-UI or test code can reference that
+core package alone.)
 
 ## Use
 
 Ensure `FluentTheme` is in your `Application.Styles`, then:
 
 ```csharp
-using Palette.Theming;
+using ArcticGizmo.Avalonia.Palette;
 
 public override void OnFrameworkInitializationCompleted()
 {

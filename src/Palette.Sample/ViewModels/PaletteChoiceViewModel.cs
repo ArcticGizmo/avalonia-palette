@@ -1,6 +1,6 @@
 using Avalonia.Media;
-using Palette.Theming;
-using Palette.Theming.Color;
+using ArcticGizmo.Avalonia.Palette;
+using ArcticGizmo.Avalonia.Palette.Color;
 
 namespace Palette.Sample.ViewModels;
 

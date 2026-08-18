@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Palette.Theming;
+using ArcticGizmo.Avalonia.Palette;
 
 namespace Palette.Sample.ViewModels;
 

@@ -5,9 +5,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
-    <RootNamespace>Palette.Theming</RootNamespace>
-    <AssemblyName>Palette.Theming</AssemblyName>
-    <!-- This is a reusable theming library other Avalonia apps reference. -->
+    <RootNamespace>ArcticGizmo.Avalonia.Palette</RootNamespace>
+    <AssemblyName>ArcticGizmo.Avalonia.Palette</AssemblyName>
+    <!-- This is a reusable theming library other Avalonia apps reference. It layers the
+         Avalonia live-swap engine (ThemeManager, Rgb→brush bridge) over the UI-free
+         Palette.Core package. -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
@@ -19,7 +21,7 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>ArcticGizmo.Avalonia.Palette</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.3.0</Version>
     <Authors>ArcticGizmo</Authors>
     <Company>ArcticGizmo</Company>
     <Title>Avalonia Palette — eye-strain-friendly theming</Title>
@@ -30,7 +32,7 @@
     <PackageProjectUrl>https://github.com/ArcticGizmo/avalonia-pallete</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ArcticGizmo/avalonia-pallete</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>0.1.0 — initial release: token contract, ThemeManager live swap, 18 palettes, WCAG report + verify gate, optional ThemePreferences persistence.</PackageReleaseNotes>
+    <PackageReleaseNotes>0.3.0 — BREAKING: root namespace is now ArcticGizmo.Avalonia.Palette (was Palette.Theming); update your usings. The UI-free model now ships in the ArcticGizmo.Avalonia.Palette.Core package (auto-referenced). New: consumer-registerable + pinned tokens (ThemeManager.RegisterTokens/TokenSpec), ThemeManager.Current.Rgb(token), manageFluentVariant opt-out, PaletteCatalog.Find, PaletteCodec share codes, ThemeTokens.Error alias, floating Avalonia [12.0.5,13.0.0).</PackageReleaseNotes>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -45,8 +47,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Base Avalonia only; consumers bring Desktop/Browser/etc. heads themselves. -->
-    <PackageReference Include="Avalonia" Version="12.0.5" />
+    <!-- Base Avalonia only; consumers bring Desktop/Browser/etc. heads themselves.
+         Floating range (not an exact pin) so consumers on a newer 12.x don't have to
+         lockstep-downgrade to match us. -->
+    <PackageReference Include="Avalonia" Version="[12.0.5,13.0.0)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The UI-free model. Packs as a NuGet dependency (ArcticGizmo.Avalonia.Palette.Core)
+         so consumers restore both. -->
+    <ProjectReference Include="..\Palette.Core\Palette.Core.csproj" />
   </ItemGroup>
 
 </Project>

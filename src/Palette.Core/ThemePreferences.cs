@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Palette.Theming;
+namespace ArcticGizmo.Avalonia.Palette;
 
 /// <summary>
 /// Optional per-user persistence for the chosen palette. Stored as a tiny JSON file under the

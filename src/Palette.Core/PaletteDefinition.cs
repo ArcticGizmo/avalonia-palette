@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Palette.Theming.Color;
+using ArcticGizmo.Avalonia.Palette.Color;
 
-namespace Palette.Theming;
+namespace ArcticGizmo.Avalonia.Palette;
 
 /// <summary>Whether a palette is a light or dark scheme.</summary>
 public enum PaletteVariant

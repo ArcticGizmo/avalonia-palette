@@ -1,4 +1,4 @@
-namespace Palette.Theming;
+namespace ArcticGizmo.Avalonia.Palette;
 
 /// <summary>
 /// The semantic token contract. Every palette resolves to a value for each of these
@@ -103,6 +103,7 @@ public static class ThemeTokens
     public const string Warning = "WarnBrush";                // house alias
     public const string WarningBg = "WarningBgBrush";
     public const string Danger = "DangerBrush";               // house alias
+    public const string Error = "DangerBrush";                // alias of Danger — clearer for non-IDE apps
     public const string DangerBg = "DangerBgBrush";
     public const string Info = "InfoBrush";
     public const string InfoBg = "InfoBgBrush";
