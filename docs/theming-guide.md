@@ -4,14 +4,27 @@ How to pull this template into another Avalonia app.
 
 ## 1. Reference the library
 
-Either add the project:
+The library ships as two NuGet packages:
 
-```xml
-<ProjectReference Include="..\avalonia-pallete\src\Palette.Theming\Palette.Theming.csproj" />
+| Package | Depends on | Contains |
+|---|---|---|
+| **`ArcticGizmo.Avalonia.Palette`** | Core + Avalonia | The live engine: `ThemeManager`, the `Rgb`→brush bridge. |
+| **`ArcticGizmo.Avalonia.Palette.Core`** | *(nothing — no Avalonia)* | The UI-free model: `Rgb`, `Contrast`, `CvdSim`, `ThemeTokens`, `TokenSpec`, `PaletteDefinition`, `PaletteCatalog`, `PaletteRegistry`, `PaletteCodec`, persistence. |
+
+```bash
+dotnet add package ArcticGizmo.Avalonia.Palette          # in your UI head — pulls in Core too
+dotnet add package ArcticGizmo.Avalonia.Palette.Core     # in a UI-free core / tests / alt heads
 ```
 
-…or copy the `src/Palette.Theming` folder into your solution. It depends only on the base
-`Avalonia` package (12.0.5), so it works with any Avalonia app head (Desktop, Browser, Mobile).
+Referencing the Avalonia package restores Core transitively, so a normal app only needs the first
+line. A **UI-free core assembly** (or a headless test project, or a macOS/Linux head that has no UI
+stack) can reference just `...Core` and consume the palette model, WCAG maths and CVD sim without
+taking an Avalonia dependency.
+
+The Avalonia package targets a floating `Avalonia [12.0.5, 13.0.0)`, so you don't have to
+lockstep-match our exact version. Everything lives under the `ArcticGizmo.Avalonia.Palette`
+namespace (colour types under `ArcticGizmo.Avalonia.Palette.Color`) — no generic top-level
+`Palette` namespace to collide with a `Palette` symbol in your own app.
 
 ## 2. Initialise once at startup
 
@@ -29,7 +42,7 @@ top of Fluent's control chrome):
 Then, in `App.axaml.cs`:
 
 ```csharp
-using Palette.Theming;
+using ArcticGizmo.Avalonia.Palette;
 
 public override void OnFrameworkInitializationCompleted()
 {
@@ -45,7 +58,12 @@ public override void OnFrameworkInitializationCompleted()
 ```
 
 `Initialize` also sets `Application.RequestedThemeVariant` to match the palette's light/dark
-polarity, so Fluent's built-in popups, scrollbars and carets align automatically.
+polarity, so Fluent's built-in popups, scrollbars and carets align automatically. If your app pins
+its own Fluent variant and doesn't want it overwritten on every swap, opt out:
+
+```csharp
+ThemeManager.Initialize(this, PaletteCatalog.Default, manageFluentVariant: false);
+```
 
 ## 3. Paint with the tokens
 
@@ -66,6 +84,46 @@ but `DynamicResource` is the clean default.
 ```csharp
 myBorder.Background = ThemeManager.Current.Brush(ThemeTokens.SurfaceRaised);
 myRun.Foreground   = ThemeManager.Current.Brush(ThemeTokens.SyntaxKeyword);
+```
+
+### Owner-drawn surfaces (`DrawingContext`)
+
+Three accessors, by what you need:
+
+```csharp
+SolidColorBrush b = ThemeManager.Current.Brush(ThemeTokens.Accent); // live instance — recolours itself
+Color          c = ThemeManager.Current.Color(ThemeTokens.Accent);  // current Avalonia Color (snapshot)
+Rgb            r = ThemeManager.Current.Rgb(ThemeTokens.Accent);     // current Rgb, for colour arithmetic
+```
+
+Use `Rgb(token)` when you compute colours — per-item tints, blends, best-foreground picks, gradient
+stops — because `Rgb` carries `MixWith` / `OverlayedBy` / `ToHex`:
+
+```csharp
+var track = ThemeManager.Current.Rgb(ThemeTokens.SurfaceSunken);
+var fill  = ThemeManager.Current.Rgb(ThemeTokens.Accent);
+var tint  = track.MixWith(fill, 0.5).ToColor();     // Rgb → Avalonia Color via RgbExtensions.ToColor()
+```
+
+`Color(token)` and `Rgb(token)` both return the **current, post-CVD** value — a *snapshot*, not a
+live object. For the raw un-filtered palette value use `ThemeManager.Current.CurrentPalette.Resolve()[token]`.
+
+> ⚠️ **Cached `Pen`/`ImmutablePen`/geometry don't self-recolour.** A live `SolidColorBrush` from
+> `Brush()` mutates itself on swap, but the moment you read a *colour* into a cached pen or immutable
+> object you've taken a snapshot that goes stale. Rebuild those on `PaletteChanged`:
+
+```csharp
+private IPen _grid = null!;
+
+public MyOverlay()
+{
+    RebuildPens();
+    ThemeManager.Current.PaletteChanged += (_, _) => { RebuildPens(); InvalidateVisual(); };
+}
+
+private void RebuildPens() =>
+    _grid = new Pen(ThemeManager.Current.Brush(ThemeTokens.Separator), 1); // brush arg → tracks swaps
+    // (a Pen built from a Color snapshot would NOT — that's the footgun.)
 ```
 
 ## 4. Let users swap palettes
@@ -114,7 +172,48 @@ dotnet run --project src/Palette.Sample -- --verify
 to confirm it meets AA. Pin `SelectionOverride` / `CurrentLineOverride` / `CaretOverride` if a
 derived value doesn't suit your scheme.
 
-## 7. Real code editors (AvaloniaEdit)
+## 7. Register your own tokens (and pin semantic colours)
+
+The built-in `ThemeTokens` set is IDE-shaped (lots of `Editor*` / `Syntax*` / `Diff*`). Apps with
+their own roles — an overlay surface, a usage-bar track, per-status hues — register extra tokens so
+they ride the **same** swap + in-place-mutation + CVD engine as the built-ins. Call
+`RegisterTokens` **before** `Initialize`:
+
+```csharp
+ThemeManager.RegisterTokens(
+    // Themes WITH the palette: recomputed from the seed on every swap.
+    TokenSpec.Derived("OverlayBgBrush", def => def.SurfaceSunken.MixWith(new Rgb(0, 0, 0), 0.35)),
+    TokenSpec.Derived("TreeLineBrush",  def => def.Border.MixWith(def.TextPrimary, 0.12)),
+
+    // PINNED: a constant hue that stays put across every theme (app-owned semantics —
+    // running=green, error=red — whose meaning is muscle-memory and must not drift).
+    TokenSpec.Fixed("StatusRunningBrush", Rgb.FromHex("#3FB950")),
+    TokenSpec.Fixed("StatusErrorBrush",   Rgb.FromHex("#F85149")));
+
+ThemeManager.Initialize(this, PaletteCatalog.Default);
+```
+
+Each registered key is published into `Application.Resources` like a built-in, so you consume it the
+same way: `{DynamicResource OverlayBgBrush}` in XAML, or `ThemeManager.Current.Brush("OverlayBgBrush")`
+in code. This is the graceful middle between "everything themes" and "nothing themes": theme the
+chrome, pin the semantics.
+
+A spec whose key **matches a built-in** overrides that built-in's derivation — so you can pin a
+shipped status colour without leaving the engine:
+
+```csharp
+// Hold the shipped Danger/Error colour constant across every palette swap.
+ThemeManager.RegisterTokens(TokenSpec.Fixed(ThemeTokens.Danger, Rgb.FromHex("#F85149")));
+```
+
+`ThemeTokens.Error` is an alias of `ThemeTokens.Danger` (same `DangerBrush` key) if `Error` reads
+better in your app.
+
+> Pinned (`Fixed`) colours opt out of the WCAG-AA verify gate — the gate checks the built-in
+> derivations against each palette's surfaces and can't reason about a constant you pin. Check your
+> fixed hues against your surfaces yourself (`Contrast.Ratio` / `Contrast.AdjustToMeet` help).
+
+## 8. Real code editors (AvaloniaEdit)
 
 This template demonstrates the editor surface with lightweight custom controls (see
 `src/Palette.Sample/Controls/CodeRenderer.cs`). If you use **AvaloniaEdit** for genuine editing,
@@ -133,7 +232,7 @@ map the tokens onto its properties:
 Fetch each with `ThemeManager.Current.Brush(...)` and refresh on `PaletteChanged` (AvaloniaEdit's
 `HighlightingColor` values are copied, not observed, so re-apply them in the handler).
 
-## 8. Runtime custom palettes, OS-follow, colour-blind preview
+## 9. Runtime custom palettes, OS-follow, colour-blind preview
 
 **User-defined palettes.** Any `PaletteDefinition` can be applied — built-in or not — so a custom
 theme is first-class. `PaletteRegistry.Instance` is the runtime set (built-ins + custom) that
@@ -153,6 +252,10 @@ new CustomPaletteStore("MyApp").SavePalette(mine);
 // serialise for export / import
 string json = PaletteCodec.ToJson(mine);
 PaletteDefinition back = PaletteCodec.FromJson(json);
+
+// …or a compact single-line share code for copy/paste + QR (e.g. "pal1:H4sI…")
+string code = PaletteCodec.ToShareCode(mine);
+PaletteDefinition shared = PaletteCodec.FromShareCode(code);  // throws FormatException if malformed
 ```
 
 Bind your picker to `PaletteRegistry.Instance.All` and subscribe to `PaletteRegistry.Instance.Changed`
@@ -168,11 +271,16 @@ designer's *Fix* buttons; also handy to harden a palette programmatically.
 
 **Colour-blindness preview.** `ThemeManager.Current.SetCvd(Cvd.Deuteranopia)` re-applies the
 current palette through a simulation filter so you can see the whole app as a colour-blind user
-would; `CvdSim.Simulate(rgb, type)` transforms a single colour.
+would; `CvdSim.Simulate(rgb, type)` transforms a single colour. Note this mutates the **live** app
+palette (every token, in place) — it's a real filter over the running app, not a side-channel
+preview, so remember to clear it with `SetCvd(Cvd.None)`.
 
 ## Notes
 
 - **Do not** replace the brush *instances* in `Application.Resources`; let `ThemeManager` mutate
   them. Replacing an instance breaks `StaticResource` consumers.
 - The library is UI-thread agnostic for construction but apply palettes on the UI thread.
-- `Contrast` and `Rgb` are Avalonia-free — reuse them in unit tests.
+- The whole model — `Rgb`, `Contrast`, `CvdSim`, `PaletteDefinition`, `PaletteCatalog`,
+  `PaletteCodec`, `ContrastReport` — lives in the Avalonia-free **`ArcticGizmo.Avalonia.Palette.Core`**
+  package, so you can reference it from a UI-free core assembly or a headless test project and reuse
+  the palette data, WCAG maths and CVD sim without an Avalonia dependency.

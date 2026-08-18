@@ -1,7 +1,10 @@
 # CLAUDE.md — Avalonia Palette
 
 A template that gives Avalonia apps eye-strain-friendly, user-swappable, WCAG-AA colour palettes.
-Two projects: **`Palette.Theming`** (the reusable library) and **`Palette.Sample`** (the demo).
+Three projects: **`Palette.Core`** (`src/Palette.Core`, the UI-free model — no Avalonia),
+**`Palette.Theming`** (`src/Palette.Theming`, the Avalonia engine layered on Core) and
+**`Palette.Sample`** (the demo). The namespace for both library projects is
+`ArcticGizmo.Avalonia.Palette` (colour types under `…Palette.Color`).
 
 ## Build / run / verify
 
@@ -9,15 +12,19 @@ Two projects: **`Palette.Theming`** (the reusable library) and **`Palette.Sample
 dotnet build Palette.slnx
 dotnet run   --project src/Palette.Sample                # launch the demo GUI (or run.bat)
 dotnet run   --project src/Palette.Sample -- --verify    # headless WCAG gate (CI-friendly)
-dotnet pack  src/Palette.Theming -c Release -o artifacts  # build the distributable NuGet package
+dotnet pack  Palette.slnx -c Release -o artifacts        # build both distributable NuGet packages
 ```
 
-`Palette.Theming` ships as the NuGet package **`ArcticGizmo.Avalonia.Palette`** (assembly/namespace
-stays `Palette.Theming`; metadata in its `.csproj`). Releases are automated: pushing a `v*` tag runs
-`.github/workflows/publish.yml`, which WCAG-gates, packs with the tag's version, and publishes to
-nuget.org via **Trusted Publishing** (OIDC — no stored API key; needs repo secret `NUGET_USER` and a
-matching nuget.org policy). Distribution options: `docs/publishing.md`. The token key names are the
-public API, so renaming one is a breaking change.
+The library ships as **two** NuGet packages: **`ArcticGizmo.Avalonia.Palette.Core`** (`Palette.Core`,
+net10.0, no Avalonia — the model) and **`ArcticGizmo.Avalonia.Palette`** (`Palette.Theming`, the
+Avalonia engine, which depends on Core). Assembly names match the package ids; the shared namespace
+is `ArcticGizmo.Avalonia.Palette`. Releases are automated: pushing a `v*` tag runs
+`.github/workflows/publish.yml`, which WCAG-gates, packs the **solution** with the tag's version
+(both packages, engine pinned to the same Core version), and publishes to nuget.org via **Trusted
+Publishing** (OIDC — no stored API key; needs repo secret `NUGET_USER` and a nuget.org policy
+covering **both** package ids). Distribution options: `docs/publishing.md`. The token *string* key
+names (`FormBgBrush`, …) are the public API, so renaming one is a breaking change; the C# namespace
+was renamed off the generic `Palette` in 0.3.0 (string keys were untouched).
 
 .NET 10 SDK · Avalonia 12.0.5 · CommunityToolkit.Mvvm · Fluent base theme. No central package
 management (versions are pinned per-`.csproj`, matching the author's sibling apps).
@@ -37,17 +44,19 @@ palette swap, **mutates each brush's `.Color` in place**. That in-place mutation
 
 | Concern | File |
 |---|---|
-| Token contract (~70 keys, incl. house aliases) | `src/Palette.Theming/ThemeTokens.cs` |
-| A palette's seed roles + derivation | `src/Palette.Theming/PaletteDefinition.cs` |
-| The 18 built-in palettes (9 families × L/D) | `src/Palette.Theming/PaletteCatalog.cs` |
-| Built-ins + custom palettes (runtime set) | `src/Palette.Theming/PaletteRegistry.cs` |
-| Palette ↔ JSON | `src/Palette.Theming/PaletteCodec.cs` |
-| Persist user palettes | `src/Palette.Theming/CustomPaletteStore.cs` |
-| Live swap engine (+ CVD filter, OS-follow) | `src/Palette.Theming/ThemeManager.cs` |
-| Per-user persistence (optional) | `src/Palette.Theming/ThemePreferences.cs` |
-| WCAG maths + AdjustToMeet (Avalonia-free) | `src/Palette.Theming/Color/Contrast.cs` |
-| Colour-blindness simulation | `src/Palette.Theming/Color/CvdSim.cs` |
-| WCAG report model | `src/Palette.Theming/ContrastReport.cs` |
+| Token contract (~75 keys, incl. house aliases + `Error`) | `src/Palette.Core/ThemeTokens.cs` |
+| Consumer-registered / pinned token specs | `src/Palette.Core/TokenSpec.cs` |
+| A palette's seed roles + derivation | `src/Palette.Core/PaletteDefinition.cs` |
+| The 18 built-in palettes (9 families × L/D) | `src/Palette.Core/PaletteCatalog.cs` |
+| Built-ins + custom palettes (runtime set) | `src/Palette.Core/PaletteRegistry.cs` |
+| Palette ↔ JSON + compact share codes | `src/Palette.Core/PaletteCodec.cs` |
+| Persist user palettes | `src/Palette.Core/CustomPaletteStore.cs` |
+| Live swap engine (+ CVD filter, OS-follow, token registration) | `src/Palette.Theming/ThemeManager.cs` |
+| Per-user persistence (optional) | `src/Palette.Core/ThemePreferences.cs` |
+| WCAG maths + AdjustToMeet (Avalonia-free) | `src/Palette.Core/Color/Contrast.cs` |
+| Colour-blindness simulation | `src/Palette.Core/Color/CvdSim.cs` |
+| Rgb → Avalonia brush/colour bridge | `src/Palette.Theming/Color/RgbExtensions.cs` |
+| WCAG report model | `src/Palette.Core/ContrastReport.cs` |
 | Shared control styles | `src/Palette.Sample/Styles/Controls.axaml` |
 | Editor / diff surfaces (code-built) | `src/Palette.Sample/Controls/CodeRenderer.cs` |
 | AvaloniaEdit syntax colouriser | `src/Palette.Sample/Controls/TokenColorizer.cs` |
