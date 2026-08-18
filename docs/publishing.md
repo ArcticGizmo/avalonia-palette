@@ -100,17 +100,21 @@ only be unlisted, not deleted.
    > If you don't see **Trusted Publishing**, it's still rolling out to accounts — use the
    > API-key fallback below meanwhile.
    >
-   > **Two package ids now.** The workflow packs and pushes **both**
-   > `ArcticGizmo.Avalonia.Palette` and `ArcticGizmo.Avalonia.Palette.Core`, so the trusted
-   > publishing policy must cover both ids. A single policy scoped to the repo/workflow covers any
-   > id the workflow pushes, but if your account scopes policies per-package (or you pre-create
-   > package pages / reserve an id prefix), make sure `ArcticGizmo.Avalonia.Palette.Core` is
-   > covered too — otherwise its push is rejected while the main package succeeds. The `Core`
-   > package is new in v0.3.0, so it has no existing page/ownership yet.
+   > **Two package ids now, but still one policy.** The workflow packs and pushes **both**
+   > `ArcticGizmo.Avalonia.Palette` and `ArcticGizmo.Avalonia.Palette.Core`. A trusted-publishing
+   > policy has **no package-name field** — it's scoped by repository owner + repository + workflow
+   > (+ optional environment) and "applies to all packages owned by the selected owner"
+   > ([docs](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing#policy-ownership)).
+   > So your existing policy already covers the new `Core` id; you do **not** need a second policy.
+   > The only thing to confirm is **id availability**: the first push creates
+   > `ArcticGizmo.Avalonia.Palette.Core`, which succeeds as long as that id isn't already owned by
+   > another account and isn't blocked by a reserved id prefix held elsewhere (owning
+   > `ArcticGizmo.Avalonia.Palette` makes that a non-issue unless a separate `ArcticGizmo.*` prefix
+   > reservation applies).
 3. **GitHub repo secret** — add `NUGET_USER` = your nuget.org **profile name** (not your email).
    The workflow passes it to the `NuGet/login` action.
 4. You do **not** pre-create the package pages; the first successful push creates each (both ids)
-   and assigns ownership to your account — subject to the policy-coverage note above.
+   and assigns ownership to your account.
 
 > **Private-repo note:** a new policy is "pending activation" for 7 days until a first publish
 > locks it to your repo/owner IDs (prevents repo-name resurrection attacks). Public repos activate
