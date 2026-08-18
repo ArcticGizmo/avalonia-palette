@@ -1,3 +1,5 @@
+using System.IO.Compression;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using ArcticGizmo.Avalonia.Palette.Color;
@@ -40,4 +42,76 @@ public static class PaletteCodec
         string.IsNullOrWhiteSpace(json)
             ? Array.Empty<PaletteDefinition>()
             : JsonSerializer.Deserialize<List<PaletteDefinition>>(json, Options) ?? new();
+
+    // ── Compact share codes ──────────────────────────────────────────────
+    //
+    // A single-line, copy/paste- and QR-friendly encoding of one palette: the JSON above,
+    // gzip-compressed, base64url-encoded, and tagged with a version prefix so the format can
+    // evolve. Round-trips through the same JSON schema, so anything ToJson can carry, a share
+    // code carries too.
+
+    private const string ShareCodePrefix = "pal1:";
+
+    private static readonly JsonSerializerOptions CompactOptions = new()
+    {
+        WriteIndented = false,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        Converters =
+        {
+            new RgbJsonConverter(),
+            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+        }
+    };
+
+    /// <summary>
+    /// Encode a palette as a compact, single-line share code (e.g. <c>pal1:H4sIAAAA…</c>) suitable
+    /// for copy/paste or a QR code. Reverse with <see cref="FromShareCode"/>.
+    /// </summary>
+    public static string ToShareCode(PaletteDefinition palette)
+    {
+        var json = JsonSerializer.SerializeToUtf8Bytes(palette, CompactOptions);
+        using var buffer = new MemoryStream();
+        using (var gz = new GZipStream(buffer, CompressionLevel.Optimal, leaveOpen: true))
+            gz.Write(json, 0, json.Length);
+        return ShareCodePrefix + ToBase64Url(buffer.ToArray());
+    }
+
+    /// <summary>
+    /// Decode a share code produced by <see cref="ToShareCode"/>. Throws
+    /// <see cref="FormatException"/> if the code is missing its prefix or otherwise malformed.
+    /// </summary>
+    public static PaletteDefinition FromShareCode(string code)
+    {
+        if (string.IsNullOrWhiteSpace(code))
+            throw new FormatException("Share code was empty.");
+
+        var s = code.Trim();
+        if (!s.StartsWith(ShareCodePrefix, StringComparison.Ordinal))
+            throw new FormatException($"Share code must start with '{ShareCodePrefix}'.");
+
+        try
+        {
+            var compressed = FromBase64Url(s[ShareCodePrefix.Length..]);
+            using var input = new MemoryStream(compressed);
+            using var gz = new GZipStream(input, CompressionMode.Decompress);
+            using var output = new MemoryStream();
+            gz.CopyTo(output);
+            var json = Encoding.UTF8.GetString(output.ToArray());
+            return FromJson(json);
+        }
+        catch (Exception ex) when (ex is not FormatException)
+        {
+            throw new FormatException("Share code was not a valid palette.", ex);
+        }
+    }
+
+    private static string ToBase64Url(byte[] bytes) =>
+        Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+
+    private static byte[] FromBase64Url(string s)
+    {
+        var b64 = s.Replace('-', '+').Replace('_', '/');
+        return Convert.FromBase64String(b64.PadRight((b64.Length + 3) / 4 * 4, '='));
+    }
 }

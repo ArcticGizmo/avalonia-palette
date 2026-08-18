@@ -29,7 +29,14 @@ public sealed class ThemeManager
             "ThemeManager.Initialize(app) must be called before ThemeManager.Current is used.");
 
     private readonly Dictionary<string, SolidColorBrush> _brushes = new(StringComparer.Ordinal);
-    private Application _app = null!;
+
+    // Consumer-registered tokens, keyed by resource key. A key that matches a built-in overrides
+    // its derivation (e.g. to pin a shipped status colour); a new key adds an extra token that
+    // rides the same swap/mutation/CVD machinery as the built-ins.
+    private readonly Dictionary<string, TokenSpec> _extra = new(StringComparer.Ordinal);
+
+    private Application? _app;
+    private bool _manageFluentVariant = true;
     private Cvd _cvd = Cvd.None;
     private bool _followingOs;
     private bool _osHooked;
@@ -53,6 +60,13 @@ public sealed class ThemeManager
     /// palette. Idempotent: subsequent calls just re-apply. Call once at startup, after
     /// <c>FluentTheme</c> is in <c>Application.Styles</c> and before any window is built.
     /// </summary>
+    /// <param name="app">The running application.</param>
+    /// <param name="initial">The palette to apply first.</param>
+    /// <param name="manageFluentVariant">
+    /// When true (default) each apply sets <c>Application.RequestedThemeVariant</c> to match the
+    /// palette's light/dark polarity, so Fluent's built-in control chrome tracks the palette. Pass
+    /// false if your app pins its own Fluent variant and doesn't want it overwritten on every swap.
+    /// </param>
     /// <example>
     /// <code>
     /// public override void OnFrameworkInitializationCompleted()
@@ -64,22 +78,65 @@ public sealed class ThemeManager
     /// }
     /// </code>
     /// </example>
-    public static ThemeManager Initialize(Application app, PaletteDefinition initial)
+    public static ThemeManager Initialize(Application app, PaletteDefinition initial, bool manageFluentVariant = true)
     {
         _current ??= new ThemeManager();
         _current._app = app;
+        _current._manageFluentVariant = manageFluentVariant;
 
-        // Ensure every token has a brush instance registered before first paint.
-        foreach (var key in ThemeTokens.All)
-        {
-            if (_current._brushes.ContainsKey(key)) continue;
-            var brush = new SolidColorBrush(Colors.Magenta);
-            _current._brushes[key] = brush;
-            app.Resources[key] = brush;
-        }
+        // Ensure every token — built-in and consumer-registered — has a brush instance in the
+        // application's resources before first paint.
+        foreach (var key in ThemeTokens.All) _current.EnsureBrush(key);
+        foreach (var key in _current._extra.Keys) _current.EnsureBrush(key);
 
         _current.Write(initial);
         return _current;
+    }
+
+    /// <summary>
+    /// Register extra theme tokens (or override built-in ones) so they ride the same palette-swap +
+    /// in-place-mutation + CVD machinery as the built-ins. Call before <see cref="Initialize"/>;
+    /// calling after re-applies the current palette so the new tokens paint immediately.
+    /// <para>
+    /// A <see cref="TokenSpec.Derived"/> token themes with the palette; a <see cref="TokenSpec.Fixed"/>
+    /// token stays constant across swaps. A spec whose <see cref="TokenSpec.Key"/> matches a built-in
+    /// key overrides that built-in (e.g. pin the shipped <see cref="ThemeTokens.Danger"/> colour).
+    /// </para>
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// ThemeManager.RegisterTokens(
+    ///     TokenSpec.Derived("OverlayBgBrush", def => def.SurfaceSunken.MixWith(new Rgb(0, 0, 0), 0.35)),
+    ///     TokenSpec.Fixed("StatusRunningBrush", Rgb.FromHex("#3FB950")));   // constant across themes
+    /// ThemeManager.Initialize(this, PaletteCatalog.Default);
+    /// </code>
+    /// </example>
+    public static void RegisterTokens(params TokenSpec[] specs) =>
+        RegisterTokens((IEnumerable<TokenSpec>)specs);
+
+    /// <inheritdoc cref="RegisterTokens(TokenSpec[])"/>
+    public static void RegisterTokens(IEnumerable<TokenSpec> specs)
+    {
+        if (specs is null) throw new ArgumentNullException(nameof(specs));
+        _current ??= new ThemeManager();
+
+        foreach (var spec in specs)
+        {
+            _current._extra[spec.Key] = spec;
+            if (_current._app is not null) _current.EnsureBrush(spec.Key);
+        }
+
+        // If we're already live, re-apply so the new/overridden tokens paint now.
+        if (_current._app is not null && _current.CurrentPalette is not null)
+            _current.Write(_current.CurrentPalette);
+    }
+
+    private void EnsureBrush(string key)
+    {
+        if (_brushes.ContainsKey(key)) return;
+        var brush = new SolidColorBrush(Colors.Magenta);
+        _brushes[key] = brush;
+        _app!.Resources[key] = brush;
     }
 
     /// <summary>Swap to a different palette. All bound surfaces recolour immediately.</summary>
@@ -106,6 +163,21 @@ public sealed class ThemeManager
     public global::Avalonia.Media.Color Color(string tokenKey) =>
         Brush(tokenKey)?.Color ?? Colors.Magenta;
 
+    /// <summary>
+    /// The current (post-filter) colour for a token as a framework-agnostic <see cref="Rgb"/> —
+    /// the symmetric accessor to <see cref="Brush"/> / <see cref="Color"/> for owner-drawn code that
+    /// does colour arithmetic (blends, per-item tints, best-foreground picks). Mirrors
+    /// <see cref="Color"/>, so a CVD filter is reflected here too; for the raw un-filtered palette
+    /// value use <c>CurrentPalette.Resolve()[token]</c>.
+    /// </summary>
+    public Rgb Rgb(string tokenKey)
+    {
+        var b = Brush(tokenKey);
+        if (b is null) return new Rgb(255, 0, 255);
+        var c = b.Color;
+        return new Rgb(c.R, c.G, c.B);
+    }
+
     /// <summary>Build a WCAG contrast report for the current palette (pre-filter colours).</summary>
     public ContrastReport Report() => ContrastReport.For(CurrentPalette);
 
@@ -129,7 +201,7 @@ public sealed class ThemeManager
     private void HookOs()
     {
         if (_osHooked) return;
-        var settings = _app.PlatformSettings;
+        var settings = _app?.PlatformSettings;
         if (settings is null) return; // headless / no platform
         settings.ColorValuesChanged += (_, _) => { if (_followingOs) ApplyOsVariant(); };
         _osHooked = true;
@@ -148,24 +220,32 @@ public sealed class ThemeManager
     }
 
     private bool OsPrefersDark() =>
-        _app.PlatformSettings?.GetColorValues().ThemeVariant == PlatformThemeVariant.Dark;
+        _app?.PlatformSettings?.GetColorValues().ThemeVariant == PlatformThemeVariant.Dark;
 
     // ── core write ───────────────────────────────────────────────────────
 
     private void Write(PaletteDefinition palette)
     {
         var resolved = palette.Resolve();
-        foreach (var key in ThemeTokens.All)
+
+        // Iterate the registered brushes (built-ins + consumer tokens). For each key: a consumer
+        // spec wins (add or override), otherwise the built-in derivation, then the CVD filter.
+        foreach (var (key, brush) in _brushes)
         {
-            if (!_brushes.TryGetValue(key, out var brush)) continue;
-            var rgb = resolved.TryGetValue(key, out var value) ? value : new Rgb(255, 0, 255);
+            Rgb rgb;
+            if (_extra.TryGetValue(key, out var spec)) rgb = spec.Derive(palette);
+            else if (resolved.TryGetValue(key, out var value)) rgb = value;
+            else rgb = new Rgb(255, 0, 255);
+
             if (_cvd != Cvd.None) rgb = CvdSim.Simulate(rgb, _cvd);
             brush.Color = rgb.ToColor();
         }
 
         // Keep Fluent's built-in control chrome (popups, scrollbars, caret) aligned with the
-        // palette's light/dark polarity; our tokens layer branded surfaces on top.
-        _app.RequestedThemeVariant = palette.IsDark ? ThemeVariant.Dark : ThemeVariant.Light;
+        // palette's light/dark polarity; our tokens layer branded surfaces on top. Opt out via
+        // Initialize(manageFluentVariant: false) if the app pins its own Fluent variant.
+        if (_manageFluentVariant && _app is not null)
+            _app.RequestedThemeVariant = palette.IsDark ? ThemeVariant.Dark : ThemeVariant.Light;
 
         CurrentPalette = palette;
         PaletteChanged?.Invoke(this, palette);

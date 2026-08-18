@@ -349,10 +349,17 @@ public static class PaletteCatalog
         ContrastDark, ContrastLight,
     };
 
-    /// <summary>Look a palette up by its <see cref="PaletteDefinition.Id"/>.</summary>
+    /// <summary>Look a palette up by its <see cref="PaletteDefinition.Id"/>, or null if unknown.</summary>
+    /// <remarks>
+    /// Mirrors <see cref="PaletteRegistry.Find"/>. Prefer this over <see cref="ById"/> when the id
+    /// comes from persisted/user data (a stale saved id then falls back instead of throwing).
+    /// </remarks>
+    public static PaletteDefinition? Find(string id) =>
+        All.FirstOrDefault(p => string.Equals(p.Id, id, StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>Look a palette up by its <see cref="PaletteDefinition.Id"/>, throwing if unknown.</summary>
     public static PaletteDefinition ById(string id) =>
-        All.FirstOrDefault(p => string.Equals(p.Id, id, StringComparison.OrdinalIgnoreCase))
-        ?? throw new KeyNotFoundException($"No palette with id '{id}'.");
+        Find(id) ?? throw new KeyNotFoundException($"No palette with id '{id}'.");
 
     /// <summary>The dark and light variants for a family name.</summary>
     public static IEnumerable<PaletteDefinition> Family(string family) =>
